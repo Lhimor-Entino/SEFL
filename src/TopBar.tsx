@@ -44,7 +44,7 @@ const TopBar = (props: Props) => {
           <MenubarContent>
             <MenubarItem
               disabled={hasPendingRequest()}
-              onClick={() => saveEntry("sds")}
+              onClick={() => saveEntry()}
             >
               <HardDriveDownloadIcon className="h-4 w-4 mr-2" />  Save <MenubarShortcut>F2</MenubarShortcut>
             </MenubarItem>
@@ -53,11 +53,11 @@ const TopBar = (props: Props) => {
             >
               <RadioTowerIcon className="h-4 w-4 mr-2" />  Request <MenubarShortcut>F1</MenubarShortcut>
             </MenubarItem>
-            <MenubarItem
+            {/* <MenubarItem
               disabled={hasPendingRequest()} onClick={() => reject()}
             >
               <BookmarkXIcon className="h-4 w-4 mr-2" />  Reject <MenubarShortcut>F3</MenubarShortcut>
-            </MenubarItem>
+            </MenubarItem> */}
             <MenubarItem
             //disabled={requesting} onClick={() => reloadData()}
             >
