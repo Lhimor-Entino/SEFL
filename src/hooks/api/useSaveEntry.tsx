@@ -96,7 +96,7 @@ const useSaveEntry = () => {
                             </div>
 
                         ))}
-                    </div>, 5000)
+                    </div>, 3000)
 
                 }
             } else {

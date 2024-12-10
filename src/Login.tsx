@@ -79,7 +79,7 @@ const Login = (props: Props) => {
             //     duration: 5000
             // })
             errorToast(error.response.data.details,error.response.data.message, 5000);
-            alert('Failed to save credentials')
+           
         } finally {
             setLoading(false)
         }

@@ -360,7 +360,7 @@ function EntryForm({ }: Props) {
 
                     {
                         specIns.length > 0 && instOpen && (
-                            <Command className="w-full h-fit z-40 absolute top-8">
+                            <Command className="w-fit h-fit z-40 absolute top-8">
                                 <CommandList>
                                     <CommandGroup heading="Instructions">
                                         {
