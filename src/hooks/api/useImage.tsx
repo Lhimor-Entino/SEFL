@@ -1,5 +1,5 @@
 import { api } from "@/config"
-import { saveImg } from "@/lib/cookieUtils"
+
 import { changeImageData } from "@/store/imageReducer"
 import Cookies from "js-cookie"
 import { useState } from "react"
@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux"
 import useCustomToast from "../useCustomToast"
 
 export const useImage = () => {
-    const { loadingToast, warningToast,errorToast } = useCustomToast()
+    const { errorToast } = useCustomToast()
 
     const dispatch = useDispatch()
     const [loading,setLoading] = useState<boolean>(false)

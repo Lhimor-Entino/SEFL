@@ -7,9 +7,8 @@ import {
   MenubarShortcut,
   MenubarTrigger,
 } from "@/components/ui/menubar"
-import { ArrowLeftCircleIcon, ArrowRightCircleIcon, BookmarkXIcon, Cookie, FileCog2Icon, FlipHorizontal2Icon, HardDriveDownloadIcon, ListRestartIcon, MonitorCogIcon, PencilLine, RadioTowerIcon, RefreshCcwDot, RefreshCcwIcon, Rotate3dIcon, RotateCcwIcon, ViewIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react"
+import { ArrowLeftCircleIcon, ArrowRightCircleIcon,FileCog2Icon, FlipHorizontal2Icon, HardDriveDownloadIcon, ListRestartIcon, PencilLine, RadioTowerIcon, RefreshCcwDot, RefreshCcwIcon, Rotate3dIcon, RotateCcwIcon, ViewIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react"
 import useSaveEntry from "./hooks/api/useSaveEntry"
-import useRejectEntry from "./hooks/api/useRejectEntry"
 import useRequestEntry from "./hooks/api/useRequestEntry"
 import { hasPendingRequest, isAutoRequest, setAutoRequest } from "./lib/requestValidationUtil"
 import { Label } from "@/components/ui/label"
@@ -18,9 +17,9 @@ import Cookies from "js-cookie"
 import { useState } from "react"
 type Props = {}
 
-const TopBar = (props: Props) => {
+const TopBar = (_props: Props) => {
   const { saveEntry } = useSaveEntry()
-  const { reject } = useRejectEntry()
+
   const { request } = useRequestEntry()
   const [isAuto,setIsAuto] = useState<boolean>()
   const handleChange = () => {

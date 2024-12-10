@@ -12,7 +12,7 @@ import { EntryData, Items as ItemType } from "../types"
 import { useDispatch, useSelector } from "react-redux"
 import { addItems, changeItemData } from "../store/entryDataReducer"
 import { Input } from "../components/ui/input"
-import { useRef } from "react"
+
 type Props = {
     handleScrollToBottom : () => void
 }

@@ -2,20 +2,19 @@
 
 import * as React from "react"
 import {
-  AudioWaveform,
+ 
   BookOpen,
   Bot,
-  Command,
+  
   Frame,
-  GalleryVerticalEnd,
+
   Map,
   PieChart,
   Settings2,
   SquareTerminal,
 } from "lucide-react"
 
-import { NavMain } from "@/components/sidebarComponents/nav-main"
-import { NavProjects } from "@/components/sidebarComponents/nav-projects"
+
 import { NavUser } from "@/components/sidebarComponents/nav-user"
 import { TeamSwitcher } from "@/components/sidebarComponents/team-switcher"
 import {
@@ -24,7 +23,7 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-  useSidebar,
+
 } from "@/components/ui/sidebar"
 import Cookies from "js-cookie"
 import SeflLogo from "@/assets/img/sefl_logo.png"
@@ -160,8 +159,7 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { isMobile } = useSidebar()
-
+ 
   const isOpen = Cookies.get("sidebar:state")
   return (
     <Sidebar collapsible="icon" {...props}>

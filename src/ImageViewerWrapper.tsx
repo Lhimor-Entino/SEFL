@@ -12,7 +12,7 @@ import { APP_DOMAIN, coookie_options } from "@/config"
 import Cookies from "js-cookie"
 import { PanelTopIcon } from "lucide-react"
 import { ReactNode } from "react"
-import { useDispatch } from "react-redux"
+
 import { toast } from "sonner"
 
 interface Props {
@@ -25,7 +25,7 @@ interface Props {
 
 const ImageViewerWrapper = (props: Props) => {
     const { children, img } = props
-    const dispatch = useDispatch()
+ 
 
 
     const openNewTab = () => {

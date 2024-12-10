@@ -4,7 +4,7 @@ import {
     CardDescription,
     CardFooter,
     CardHeader,
-    CardTitle,
+
 } from "@/components/ui/card"
 import { Label } from "./components/ui/label"
 import { Input } from "./components/ui/input"
@@ -12,7 +12,7 @@ import { Button } from "./components/ui/button"
 import Cookies from 'js-cookie'
 import { FormEventHandler, useEffect, useState } from "react"
 import { api, coookie_options } from "./config"
-import { AxiosInstance } from "axios"
+
 import { EyeIcon, EyeOffIcon, Loader2Icon } from "lucide-react"
 import { cn } from "./lib/utils"
 import { useNavigate } from "react-router-dom"
@@ -22,7 +22,7 @@ interface Props {
 
 }
 
-const Login = (props: Props) => {
+const Login = (_props: Props) => {
 
     const navigate = useNavigate();
     const accepted_role = ["ROLE_QC", "ROLE_VERIFIER", "ROLE_AUDITOR"];

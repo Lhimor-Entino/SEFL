@@ -11,9 +11,9 @@ import { changeRequestData } from "@/store/entryDataReducer";
 import { changeImageData } from "@/store/imageReducer";
 
 const useLogout = () => {
-    const { loadingToast, warningToast,errorToast } = useCustomToast()
+    const { loadingToast, warningToast, } = useCustomToast()
     const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+
     const navigate = useNavigate()
     
     const dispatch = useDispatch()

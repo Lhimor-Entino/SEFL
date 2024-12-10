@@ -3,13 +3,12 @@ import { Input } from "@/components/ui/input"
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableHead,
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { entry_data } from "@/data"
+
 import useCustomToast from "@/hooks/useCustomToast"
 import { isReferenceTypeExist } from "@/lib/LookupUtil"
 import { addReference, changeReferenceData } from "@/store/entryDataReducer"
@@ -19,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux"
 
 type Props = {}
 
-const References = (props: Props) => {
+const References = (_props: Props) => {
     const itemInputClass = ` h-4 w-full text-slate-200 p-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0  border-0 focus:border-b-2  rounded-none text-xs `
     const entry_data_reducer: EntryData = useSelector((state: any) => state.entry_data_reducer);
     const instruction_data_reducer = useSelector((state: any) => state.instruction_data_reducer);

@@ -6,10 +6,10 @@ import Cookies from "js-cookie";
 
 
 const useRejectEntry = () => {
-    const { loadingToast, errorToast, closeToast,warningToast } = useCustomToast()
+    const { loadingToast,warningToast } = useCustomToast()
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const url = "dsd"
+ 
     let toastId: number | string
     const reject = async () => {
         

@@ -1,21 +1,21 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useCustomToast from "../useCustomToast";
 import { toast } from "sonner";
-import { hasOngoingRequest, hasPendingRequest, setNewRequest, setOngoingRequest, setRequestToDone } from "@/lib/requestValidationUtil";
-import { api, coookie_options } from "@/config";
+import { hasPendingRequest, setNewRequest, setOngoingRequest, setRequestToDone } from "@/lib/requestValidationUtil";
+import { api } from "@/config";
 import Cookies from "js-cookie";
 import { useDispatch } from "react-redux";
 import { changeRequestData } from "@/store/entryDataReducer";
-import { saveImg } from "@/lib/cookieUtils";
+
 import { changeImageData } from "@/store/imageReducer";
-import { entry_data } from "@/data";
+
 import useInstructionLookup from "./useInstructionLookup";
 
 
 const useRequestEntry = () => {
-    const { loadingToast, warningToast, errorToast } = useCustomToast()
+    const { loadingToast, warningToast,  } = useCustomToast()
     const {getInstructions} = useInstructionLookup()
-    const [data, setData] = useState<null>(null);
+    
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const dispatch = useDispatch()
@@ -93,7 +93,7 @@ const useRequestEntry = () => {
 
 
 
-    return { request, data, loading, error };
+    return { request, loading, error };
 }
 
 export default useRequestEntry;

@@ -23,17 +23,17 @@ import {
 } from "@/components/ui/sidebar"
 import ImageViewerWrapper from "./ImageViewerWrapper"
 import TopBar from "./TopBar"
-import { useEffect, useLayoutEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import Cookies from "js-cookie"
 import { useNavigate } from "react-router-dom"
 import useRequestEntry from "./hooks/api/useRequestEntry"
 import useInstructionLookup from "./hooks/api/useInstructionLookup"
-import { getImg } from "./lib/cookieUtils"
+
 import { useSelector } from "react-redux"
 
 type Props = {}
 
-const Home = (props: Props) => {
+const Home = (_props: Props) => {
   const navigate = useNavigate();
   const image_data_reducer = useSelector((state: any) => state.image_data_reducer);
   const { request } = useRequestEntry()

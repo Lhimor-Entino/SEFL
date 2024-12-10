@@ -4,18 +4,18 @@ import { Input } from "@/components/ui/input"
 import {
     Table,
     TableBody,
-    TableCaption,
+
     TableCell,
     TableHead,
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { entry_data } from "@/data"
+
 import useCustomToast from "@/hooks/useCustomToast"
 import { Accessorial_Type, isAccessorialTypeExist, Other_Type } from "@/lib/LookupUtil"
-import { addAccessorial, addReference, changeAccessorialData, changeReferenceData, setAccessorialData } from "@/store/entryDataReducer"
-import { Accessorial, EntryData, ReferenceNumbers } from "@/types"
-import { BookMarkedIcon, CaptionsIcon, MousePointerClickIcon, PlusCircleIcon, SearchIcon } from "lucide-react"
+import { addAccessorial, changeAccessorialData, setAccessorialData } from "@/store/entryDataReducer"
+import { Accessorial, EntryData, } from "@/types"
+import {  CaptionsIcon, MousePointerClickIcon, PlusCircleIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
@@ -23,13 +23,11 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog"
 
-import { Label } from "@/components/ui/label"
+
 import { Badge } from "@/components/ui/badge"
 
 type Props = {}

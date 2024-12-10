@@ -1,14 +1,14 @@
 
-import { EntryData, InfoFields, Items } from "@/types";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { WritableDraft } from "immer";
+
+import { createSlice } from "@reduxjs/toolkit";
+
 const data: any = []
 
 const instructionLookup = createSlice({
     name: "request",
     initialState: data,
     reducers: {
-      changeInstructionData: (state, action) => {
+      changeInstructionData: (_state, action) => {
         const {  newValue } = action.payload;
   
         return newValue;

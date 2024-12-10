@@ -50,13 +50,13 @@ const useCustomToast = () => {
     //     });
     // };
 
-    const createdToast = (title: string) => {
+    const createdToast = (_title: string) => {
         // return toast({
         //     title: title,
         //    // description: getDateTime(),
         // })
     }
-    const deactivateToast = (title: string) => {
+    const deactivateToast = (_title: string) => {
         // return toast({
         //     title: title,
         //   //  description: getDateTime(),

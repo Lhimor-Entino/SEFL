@@ -1,105 +1,15 @@
 
-import { Accessorial, EntryData, InfoFields, Items, ReferenceNumbers } from "@/types";
+import { Accessorial, EntryData, Items, ReferenceNumbers } from "@/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { WritableDraft } from "immer";
 const data: EntryData = {}
 
-// const data : EntryData = {
-//     "proNumber": "116-0534945-1",
-//     "type": "LTL",
-//     "masterProNumber": "254210467-1", 
-//     "osd": null,
-//     "pc": 8,
-//     "consignee": {
-//       "name": "LOWE'S OF ELKHART, IN",
-//       "address1": "110 COUNTY ROAD 6 W",
-//       "address2": null,
-//       "contactName": "Receiving Department",
-//       "contactNumber": "5742062900",
-//       "city": "ELKHART",
-//       "state": "IN",
-//       "zip": "46514"
-//     },
-//     "shipper": {
-//       "name": "HUMBLE/ATLANTIC COAST IMPORT DISTRIBUTORS",
-//       "address1": "1890 SWARTHMORE AVE",
-//       "address2": null,
-//       "contactName": "Shipping Department", 
-//       "contactNumber": "7323643038",
-//       "city": "LAKEWOOD",
-//       "state": "NJ",
-//       "zip": "08701"
-//     },
-//     "billTo": {
-//       "name": "LOWE'S COMPANIES, INC.",
-//       "address1": "1000 LOWE'S BLVD.",
-//       "address2": null,
-//       "contactName": "Billing Department", 
-//       "contactNumber": null, 
-//       "city": "MOORESVILLE",
-//       "state": "NC",
-//       "zip": "28117"
-//     },
-//     "billClerk": null,
-//     "il": null,
-//     "date": "2023-12-08",
-//     "pickupDate": "2023-12-09",
-//     "term": "Collect",
-//     "weight": 110.2,
-//     "ilPro": null,
-//     "bills": 1,
-//     "puTrailer": null,
-//     "orig": null,
-//     "dest": null,
-//     "shc": null,
-//     "specialInstructions": [
-//       "DO NOT DOUBLE STACK",
-//       "CALL UPON DELIVERY",
-//       "DO NOT DISASSEMBLE PALLET",
-//       "LIFTGATE DELIVERY"
-//     ],
-//     "plt": 1,
-//     "lpsc": null,
-//     "tpcs": 8, 
-//     "items": [
-//       {
-//         "charge": null,
-//         "pieces": 1,
-//         "hm": null,
-//         "ref": "5179233",
-//         "description": "Acrylic Bathtub",
-//         "weight": null,
-//         "sqYds": null,
-//         "class": "70"
-//       },
-//       {
-//         "charge": null,
-//         "pieces": 3,
-//         "hm": null,
-//         "ref": null,
-//         "description": "ACER MONITOR 17\"",
-//         "weight": null, 
-//         "sqYds": null,
-//         "class": "100"
-//       },
-//           {
-//         "charge": null,
-//         "pieces": 4,
-//         "hm": null,
-//         "ref": null,
-//         "description": "LOLLIPOP SWEET, DO NOT FREEZE",
-//         "weight": null,
-//         "sqYds": null,
-//         "class": "200"
-//       }
-//     ]
-//   }
 
 const entryData = createSlice({
   name: "request",
   initialState: data,
   reducers: {
-    changeRequestData: (state, action) => {
+    changeRequestData: (_state, action) => {
       const { newValue } = action.payload;
 
       return newValue;

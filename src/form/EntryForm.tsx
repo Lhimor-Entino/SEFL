@@ -3,14 +3,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
     Command,
-    CommandDialog,
-    CommandEmpty,
     CommandGroup,
-    CommandInput,
     CommandItem,
     CommandList,
-    CommandSeparator,
-    CommandShortcut,
+
 } from "@/components/ui/command"
 
 import Items from "@/form/Items"
@@ -18,7 +14,7 @@ import { addInstruction, changeBillingAccountInfoData, changeBillingInfo, update
 
 import { EntryData } from "@/types"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Button } from "@/components/ui/button"
 import useBottomDivAutoScroll from "@/hooks/useBottomDivAutoScroll"
@@ -26,7 +22,6 @@ import useShortcutKeys from "@/hooks/keyboardHooks/useShortcutKeys"
 import { ListCollapseIcon, Trash2Icon } from "lucide-react"
 import References from "./References"
 import Accessorials from "./Accessorials"
-import { validateProNumber } from "@/lib/validationUtils"
 import { Accessorial_Type } from "@/lib/LookupUtil"
 
 type Props = {}
@@ -74,7 +69,7 @@ function EntryForm({ }: Props) {
     }
 
     const removeSpecialInstruction = (index_: number) => {
-        const filtered = entry_data_reducer.specialInstructions?.filter((sp:any,index:number) => index !== index_ )
+        const filtered = entry_data_reducer.specialInstructions?.filter((_sp:any,index:number) => index !== index_ )
 
         dispatch(updateInstruction({newValue:filtered}))
     }

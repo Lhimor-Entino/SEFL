@@ -7,7 +7,7 @@ import SeparateTabImageViewer from './SeparateTabImageViewer'
 
 import useRequestKeyboardHooks from './hooks/keyboardHooks/useRequestKeyboardHooks'
 import useNavigationKeyboardHooks from './hooks/keyboardHooks/useNavigationKeyboardHooks'
-import useShortcutKeys from './hooks/keyboardHooks/useShortcutKeys';
+
 
 const router = createBrowserRouter([
   {

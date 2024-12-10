@@ -15,7 +15,7 @@ const useRequestKeyboardHooks = () => {
     const { errorToast, warningToast } = useCustomToast()
     const { saveEntry } = useSaveEntry(); // Call your custom hook
     // Use the custom hook to fetch the data
-    const { data: fetchedData, request } = useRequestEntry();
+    const { request } = useRequestEntry();
     const { reject } = useRejectEntry();
 
     useEffect(() => {
