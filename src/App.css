@@ -1,0 +1,43 @@
+.entry__form::-webkit-scrollbar {
+  display: none;
+}
+
+.entry__form {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+html,body{
+  height: 100%;
+  width: 100%;
+}
+
+/* For the entire scrollbar */
+::-webkit-scrollbar {
+
+  width: 12px; /* Width of the vertical scrollbar */
+  height: 12px; /* Height of the horizontal scrollbar */
+}
+
+/* The track (background) of the scrollbar */
+::-webkit-scrollbar-track {
+  background-color: #f1f1f1; /* Light grey background */
+  border-radius: 10px;
+}
+
+/* The thumb (the draggable part of the scrollbar) */
+::-webkit-scrollbar-thumb {
+  background-color: #0B2447; /* Darker thumb color */
+  border-radius: 10px;
+  border: 3px solid #f1f1f1; /* Optional border around thumb */
+}
+
+/* The thumb on hover (when the user hovers over the scrollbar thumb) */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #0B2447; /* Darker color on hover */
+}
+
+/* The corner (where horizontal and vertical scrollbars meet) */
+::-webkit-scrollbar-corner {
+  background-color: #f1f1f1;
+}
