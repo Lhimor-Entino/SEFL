@@ -1,11 +1,10 @@
-export const Accessorial_Type = "SPECIAL INSTRUCTION"
+export const Instruction_Type = "INSTRUCTION"
 export const Reference_Type = "REFERENCE"
-export const Other_Type = "OTHERS"
+export const Charges_Type = "CHARGES"
 
 export const isReferenceTypeExist= (instructions:any,code:string) => {
 
-        const findIndex = instructions.findIndex((ins:any) => ins.ins_code === code && ins.type === Reference_Type  ||
-                         ins.charge_code === code && ins.type === Reference_Type  )
+        const findIndex = instructions.findIndex((ins:any) => ins.code === code.toUpperCase() && ins.type === Reference_Type )
 
         if(findIndex !== -1){
             return true
@@ -15,8 +14,7 @@ export const isReferenceTypeExist= (instructions:any,code:string) => {
 
 export const isAccessorialTypeExist= (instructions:any,code:string) => {
 
-    const findIndex = instructions.findIndex((ins:any) => ins.ins_code === code  && ins.type === Accessorial_Type  || 
-    ins.charge_code === code && ins.type === Other_Type )
+    const findIndex = instructions.findIndex((ins:any) => ins.code === code.toUpperCase()  && ins.type === Charges_Type )
 
     if(findIndex !== -1){
         return true

@@ -7,19 +7,19 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Button } from "../components/ui/button"
-import { LayoutListIcon, PlusCircleIcon } from "lucide-react"
+import { LayoutListIcon, PlusCircleIcon, Trash2Icon } from "lucide-react"
 import { EntryData, Items as ItemType } from "../types"
 import { useDispatch, useSelector } from "react-redux"
-import { addItems, changeItemData } from "../store/entryDataReducer"
+import { addItems, changeItemData, removeItem } from "../store/entryDataReducer"
 import { Input } from "../components/ui/input"
 
 type Props = {
-    handleScrollToBottom : () => void
+    handleScrollToBottom: () => void
 }
 const itemInputClass = ` h-4 w-full text-slate-200 p-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0  border-0 focus:border-b-2  rounded-none text-xs `
 const Items = (props: Props) => {
 
-    const {handleScrollToBottom} = props
+    const { handleScrollToBottom } = props
 
     const entry_data_reducer: EntryData = useSelector((state: any) => state.entry_data_reducer);
     const dispatch = useDispatch()
@@ -34,15 +34,19 @@ const Items = (props: Props) => {
 
     }
 
+    const handleRemoveItem = (index: number) => {
+        dispatch(removeItem({ index }))
+    }
+
     return (
         <div className="mt-14">
             <div className="flex justify-between">
-            <div className=" flex items-center gap-x-2">
-                    <LayoutListIcon className= " w-4 h-4 text-white" />
-                <p className="text-white font-bold">Items </p>
+                <div className=" flex items-center gap-x-2">
+                    <LayoutListIcon className=" w-4 h-4 text-white" />
+                    <p className="text-white font-bold">Items </p>
                 </div>
                 <Button size={"sm"} onClick={() => handleAddItem()} className="bg-slate-300  text-slate-900 hover:bg-slate-300">
-                    <PlusCircleIcon /> <p><span className=" underline">A</span>dd Item</p>
+                    <PlusCircleIcon /> <p>Add Item</p>
                 </Button>
             </div>
             <Table>
@@ -57,6 +61,7 @@ const Items = (props: Props) => {
                         <TableHead >WEIGHT</TableHead>
                         <TableHead>SQ YADS</TableHead>
                         <TableHead>CLASS</TableHead>
+                        <TableHead>ACTION</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -74,6 +79,9 @@ const Items = (props: Props) => {
                                     <TableCell><Input tabIndex={currentStartIndex + 6} className={`${itemInputClass}`} onChange={({ target }) => handleChangeItem(target.value, index, "weight")} value={item.weight || ""} /></TableCell>
                                     <TableCell><Input tabIndex={currentStartIndex + 7} className={`${itemInputClass}`} onChange={({ target }) => handleChangeItem(target.value, index, "sqYds")} value={item.sqYds || ""} /></TableCell>
                                     <TableCell><Input tabIndex={currentStartIndex + 8} className={`${itemInputClass}`} onChange={({ target }) => handleChangeItem(target.value, index, "class")} value={item.class || ""} /></TableCell>
+                                    <TableCell className=" flex justify-end">
+                                        <Trash2Icon onClick={() => handleRemoveItem(index)} className=" cursor-pointer w-4 h-5 mr-3 text-red-600" />
+                                    </TableCell>
                                 </TableRow>
                             )
                         }
@@ -82,7 +90,7 @@ const Items = (props: Props) => {
                     }
                 </TableBody>
             </Table>
-      
+
         </div>
     )
 }

@@ -22,19 +22,22 @@ import useShortcutKeys from "@/hooks/keyboardHooks/useShortcutKeys"
 import { ListCollapseIcon, Trash2Icon } from "lucide-react"
 import References from "./References"
 import Accessorials from "./Accessorials"
-import { Accessorial_Type } from "@/lib/LookupUtil"
+
+import useInstructionLookup from "@/hooks/api/useInstructionLookup"
+import { validateAccountField } from "@/lib/validationUtils"
+import { Instruction_Type } from "@/lib/LookupUtil"
 
 type Props = {}
 
 function EntryForm({ }: Props) {
     const entry_data_reducer: EntryData = useSelector((state: any) => state.entry_data_reducer);
- 
+
     const instruction_data_reducer = useSelector((state: any) => state.instruction_data_reducer);
     const dispatch = useDispatch();
-
+    const { getInstructions } = useInstructionLookup()
     const [specIns, setSpecIns] = useState<string>("")
 
-    const { divRef, handleScrollToBottom } = useBottomDivAutoScroll()
+    const { divRef,divRef2,divRef3,handleScrollToBottomRef, handleScrollToBottom,handleScrollToBottomCharge } = useBottomDivAutoScroll()
     const [specialInstructions, setSpecialInstructions] = useState<any>()
     const [instOpen, setInstOpen] = useState<boolean>(true)
     const isFilled = (value: string) => {
@@ -55,28 +58,38 @@ function EntryForm({ }: Props) {
 
     const handleOtherInfoChange = (value: string, property: string) => {
 
-        const payload = { newValue: value, property: property }
+        const payload = { newValue: value.toUpperCase(), property: property }
         dispatch(changeBillingInfo(payload))
-     
-      
+
+
     }
     const handleAddInstruction = (ins: any) => {
 
         dispatch(addInstruction({ newValue: ins.description }))
-        setSpecIns(ins.ins_code)
+        setSpecIns(ins.code)
         setInstOpen(false)
         setSpecIns("")
     }
 
     const removeSpecialInstruction = (index_: number) => {
-        const filtered = entry_data_reducer.specialInstructions?.filter((_sp:any,index:number) => index !== index_ )
+        const filtered = entry_data_reducer.specialInstructions?.filter((_sp: any, index: number) => index !== index_)
 
-        dispatch(updateInstruction({newValue:filtered}))
+        dispatch(updateInstruction({ newValue: filtered }))
     }
-    useShortcutKeys({ handleScrollToBottom })
+
+    const validateField = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        let value = e.key
+        let res = validateAccountField(value)
+        if (res == "error") {
+            e.preventDefault()
+        }
+    }
+
+
+
 
     useEffect(() => {
-        const filtered = instruction_data_reducer.filter((ins:any) => ins.type == Accessorial_Type)
+        const filtered = instruction_data_reducer.filter((ins: any) => ins.type == Instruction_Type)
         setSpecialInstructions(filtered)
     }, [instruction_data_reducer])
 
@@ -86,14 +99,19 @@ function EntryForm({ }: Props) {
 
     useEffect(() => {
         // JUST UPDATE THE PREPAID
-        if( !entry_data_reducer.terms) return
+        if (!entry_data_reducer.terms) return
         let val = entry_data_reducer.terms;
         const payload = { newValue: val.toString().charAt(0), property: "terms" }
         console.log(payload)
         dispatch(changeBillingInfo(payload))
-    },[entry_data_reducer]) 
+        getInstructions()
+    }, [entry_data_reducer])
+
+
+    // BINDING
+    useShortcutKeys({ handleScrollToBottom,handleScrollToBottomRef,handleScrollToBottomCharge })
     return (
-        <div className="h-[520px] overflow-scroll entry__form mt-2 ">
+        <div className="h-[clamp(500px,80vh,1000px)] overflow-y-scroll entry__form mt-2 ">
 
             <div className=" grid grid-flow-col grid-cols-6 gap-x-4 ">
                 <div className="grid grid-flow-col space-y-1.5 space-x-2">
@@ -135,23 +153,27 @@ function EntryForm({ }: Props) {
             </div>
 
             <div className="grid grid-cols-3 gap-x-3 mt-3">
+                {/* SHIPPER */}
                 <div className="flex flex-col gap-y-2">
                     <Input id="shipTo_name" tabIndex={6}
+                        onKeyDown={(e) => validateField(e)}
                         onChange={({ target }) => handleAccountChange(target.value, "shipper", "name")}
                         value={entry_data_reducer.shipper?.name || ''}
                         className={`${inputClass} ${isFilled(entry_data_reducer.shipper?.name || '')}`} />
                     <Input id="shipTo_address1" tabIndex={7}
+                        onKeyDown={(e) => validateField(e)}
                         onChange={({ target }) => handleAccountChange(target.value, "shipper", "address1")}
                         value={entry_data_reducer.shipper?.address1 || ''}
                         className={`${inputClass} ${isFilled(entry_data_reducer.shipper?.address1 || '')}`} />
                     <Input id="shipTo_address2" tabIndex={8}
+                        onKeyDown={(e) => validateField(e)}
                         onChange={({ target }) => handleAccountChange(target.value, "shipper", "address2")}
                         value={entry_data_reducer.shipper?.address2 || ''}
                         className={`${inputClass} ${isFilled(entry_data_reducer.shipper?.address2 || '')}`} />
-                    <Input id="shipTo_contactNumber" tabIndex={9}
+                    {/* <Input id="shipTo_contactNumber" tabIndex={9}
                         onChange={({ target }) => handleAccountChange(target.value, "shipper", "contactName")}
                         value={entry_data_reducer.shipper?.contactName || ''}
-                        className={`${inputClass} ${isFilled(entry_data_reducer.shipper?.contactName || '')}`} />
+                        className={`${inputClass} ${isFilled(entry_data_reducer.shipper?.contactName || '')}`} /> */}
 
                     <div className="grid grid-cols-3 gap-x-4">
                         <Input id="shipTo_city" tabIndex={10}
@@ -206,8 +228,10 @@ function EntryForm({ }: Props) {
                     </div>
 
                 </div>
+                {/* CONSIGNEE */}
                 <div className="flex flex-col gap-y-2">
                     <Input id="consignee.name" tabIndex={17}
+                        onKeyDown={(e) => validateField(e)}
                         onChange={({ target }) => handleAccountChange(target.value, "consignee", "name")}
                         value={entry_data_reducer.consignee?.name || ''}
                         className={`${inputClass} ${isFilled(entry_data_reducer.consignee?.name || '')}`} />
@@ -215,17 +239,19 @@ function EntryForm({ }: Props) {
 
 
                     <Input id="consignee.address1" tabIndex={18}
+                        onKeyDown={(e) => validateField(e)}
                         onChange={({ target }) => handleAccountChange(target.value, "consignee", "address1")}
                         value={entry_data_reducer.consignee?.address1 || ''}
                         className={`${inputClass} ${isFilled(entry_data_reducer.consignee?.address1 || '')}`} />
                     <Input id="consignee.address2" tabIndex={19}
+                        onKeyDown={(e) => validateField(e)}
                         onChange={({ target }) => handleAccountChange(target.value, "consignee", "address2")}
                         value={entry_data_reducer.consignee?.address2 || ''}
                         className={`${inputClass} ${isFilled(entry_data_reducer.consignee?.address2 || '')}`} />
-                    <Input id="consignee.contactNumber" tabIndex={20}
+                    {/* <Input id="consignee.contactNumber" tabIndex={20}
                         onChange={({ target }) => handleAccountChange(target.value, "consignee", "contactName")}
                         value={entry_data_reducer.consignee?.contactName || ''}
-                        className={`${inputClass} ${isFilled(entry_data_reducer.consignee?.contactName || '')}`} />
+                        className={`${inputClass} ${isFilled(entry_data_reducer.consignee?.contactName || '')}`} /> */}
                     <div className="grid grid-cols-3 gap-x-4">
                         <Input id="consignee.city" tabIndex={21}
                             onChange={({ target }) => handleAccountChange(target.value, "consignee", "city")}
@@ -285,23 +311,27 @@ function EntryForm({ }: Props) {
                         </div>
                     </div>
                 </div>
+                {/* BILL TO */}
                 <div className="flex flex-col gap-y-2">
                     <Input id="billto.name" tabIndex={29}
+                        onKeyDown={(e) => validateField(e)}
                         onChange={({ target }) => handleAccountChange(target.value, "billTo", "name")}
                         value={entry_data_reducer.billTo?.name || ''}
                         className={` ${inputClass} ${isFilled(entry_data_reducer.billTo?.name || '')}`} />
                     <Input id="billto.address1" tabIndex={30}
+                        onKeyDown={(e) => validateField(e)}
                         onChange={({ target }) => handleAccountChange(target.value, "billTo", "address1")}
                         value={entry_data_reducer.billTo?.address1 || ''}
                         className={` ${inputClass} ${isFilled(entry_data_reducer.billTo?.address1 || '')}`} />
                     <Input id="billto.address2" tabIndex={31}
+                        onKeyDown={(e) => validateField(e)}
                         onChange={({ target }) => handleAccountChange(target.value, "billTo", "address2")}
                         value={entry_data_reducer.billTo?.address2 || ''}
                         className={` ${inputClass} ${isFilled(entry_data_reducer.billTo?.address2 || '')}`} />
-                    <Input id="billto.contactNumber" tabIndex={32}
+                    {/* <Input id="billto.contactNumber" tabIndex={32}
                         onChange={({ target }) => handleAccountChange(target.value, "billTo", "contactName")}
                         value={entry_data_reducer.billTo?.contactName || ''}
-                        className={` ${inputClass} ${isFilled(entry_data_reducer.billTo?.contactName || '')}`} />
+                        className={` ${inputClass} ${isFilled(entry_data_reducer.billTo?.contactName || '')}`} /> */}
                     <div className="grid grid-cols-3 gap-x-4">
                         <Input id="billto.city" tabIndex={33}
                             onChange={({ target }) => handleAccountChange(target.value, "billTo", "city")}
@@ -360,7 +390,7 @@ function EntryForm({ }: Props) {
                                     <CommandGroup heading="Instructions">
                                         {
                                             specialInstructions.map((ins: any, index: number) =>
-                                                ins.ins_code && ins.ins_code.includes(specIns) && (
+                                                 ins.code.includes(specIns.toUpperCase()) && (
                                                     <CommandItem key={index}> <Button size={"sm"} className="w-full text-xs " onClick={() => handleAddInstruction(ins)}>{ins.description}</Button></CommandItem>
                                                 )
                                             )
@@ -405,26 +435,29 @@ function EntryForm({ }: Props) {
 
             <div className="flex flex-col gap-y-1 border border-1 p-1 pl-3 pr-3 rounded-md mt-4 border-white">
                 <div className="flex items-center gap-x-2">
-                    <ListCollapseIcon  className="text-white w-4 h-4"/>
+                    <ListCollapseIcon className="text-white w-4 h-4" />
                     <p className="text-white font-bold">Instructions</p>
                 </div>
-               
+
                 {
                     entry_data_reducer?.specialInstructions?.map((ins: any, index: number) => (
                         <div className="flex items-center gap-x-2 mt-2">
                             <p className="text-white text-[.8rem]" key={index}>  {ins}</p>
-                            <Trash2Icon onClick={() => removeSpecialInstruction(index)} className="text-red-600 w-4 h-4 cursor-pointer"/>
+                            <Trash2Icon onClick={() => removeSpecialInstruction(index)} className="text-red-600 w-4 h-4 cursor-pointer" />
                         </div>)
                     )
                 }
 
             </div>
-            <References />
+            
+            <References handleScrollToBottomRef={handleScrollToBottomRef} />
+            <div ref={divRef2} className="mb-36  -mt-20" ></div>
             <Items handleScrollToBottom={handleScrollToBottom} />
-            <div ref={divRef} className=" mb-16 " ></div>
-            <Accessorials />
+            <div ref={divRef} className=" mb-36  -mt-20" ></div>
+            <Accessorials handleScrollToBottomCharge={handleScrollToBottomCharge} />
+            <div ref={divRef3} className="mb-16 border-2  " ></div>
             {/* Placeholder for the bottom to scroll to */}
-       
+
         </div>
     )
 }

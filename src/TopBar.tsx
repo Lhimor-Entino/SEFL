@@ -7,21 +7,26 @@ import {
   MenubarShortcut,
   MenubarTrigger,
 } from "@/components/ui/menubar"
-import { ArrowLeftCircleIcon, ArrowRightCircleIcon,FileCog2Icon, FlipHorizontal2Icon, HardDriveDownloadIcon, ListRestartIcon, PencilLine, RadioTowerIcon, RefreshCcwDot, RefreshCcwIcon, Rotate3dIcon, RotateCcwIcon, ViewIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react"
+import { ArrowLeftCircleIcon, ArrowRightCircleIcon,BookmarkXIcon,FileCog2Icon, FlipHorizontal2Icon, HardDriveDownloadIcon, ListRestartIcon, PencilLine, RadioTowerIcon, RefreshCcwDot, RefreshCcwIcon, Rotate3dIcon, RotateCcwIcon, ViewIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react"
 import useSaveEntry from "./hooks/api/useSaveEntry"
 import useRequestEntry from "./hooks/api/useRequestEntry"
 import { hasPendingRequest, isAutoRequest, setAutoRequest } from "./lib/requestValidationUtil"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import Cookies from "js-cookie"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
+
+import { changeModalData } from "./store/modalReducer"
+import { useDispatch } from "react-redux"
 type Props = {}
 
 const TopBar = (_props: Props) => {
   const { saveEntry } = useSaveEntry()
-
+  const dispatch = useDispatch()
   const { request } = useRequestEntry()
+
   const [isAuto,setIsAuto] = useState<boolean>()
+  const autoRef = useRef(isAuto)
   const handleChange = () => {
     if(!Cookies.get("auto_request")){
       setAutoRequest("1")
@@ -35,6 +40,13 @@ const TopBar = (_props: Props) => {
 
     setIsAuto(isAutoRequest())
   }
+  useEffect(() => {
+    let is_auto : boolean = isAutoRequest()
+  
+
+    setIsAuto(is_auto)
+    autoRef.current = is_auto
+  },[])
   return (
     <div className="flex gap-x-5">
       <Menubar className="border-none text-white dark:text-slate-950 " >
@@ -52,11 +64,12 @@ const TopBar = (_props: Props) => {
             >
               <RadioTowerIcon className="h-4 w-4 mr-2" />  Request <MenubarShortcut>F1</MenubarShortcut>
             </MenubarItem>
-            {/* <MenubarItem
-              disabled={hasPendingRequest()} onClick={() => reject()}
+             <MenubarItem
+              disabled={hasPendingRequest()} 
+              onClick={() =>dispatch(changeModalData({property:"rejectModal"}))}
             >
               <BookmarkXIcon className="h-4 w-4 mr-2" />  Reject <MenubarShortcut>F3</MenubarShortcut>
-            </MenubarItem> */}
+            </MenubarItem> 
             <MenubarItem
             //disabled={requesting} onClick={() => reloadData()}
             >

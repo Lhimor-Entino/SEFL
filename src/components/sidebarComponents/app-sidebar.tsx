@@ -25,7 +25,7 @@ import {
   SidebarRail,
 
 } from "@/components/ui/sidebar"
-import Cookies from "js-cookie"
+
 import SeflLogo from "@/assets/img/sefl_logo.png"
 import DdcLogo from "@/assets/img/ddc.png"
 // This is sample data.
@@ -160,7 +160,7 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
  
-  const isOpen = Cookies.get("sidebar:state")
+  // const isOpen = Cookies.get("sidebar:state")
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -171,7 +171,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.projects} /> */}
  
         {
-          isOpen !=="true" ? 
+          // isOpen !=="true" ? 
           <div className="flex flex-col mt-12 ">
             <p className="rotate-90 mt-10 font-serif  tracking-[6px] ">
               Southeastern
@@ -182,19 +182,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <p className=" rotate-90 mt-24 font-serif  tracking-[6px]">
               Lines
             </p>
-          </div> : 
-          <div className="mt-4">
-            <p className=" mt-10 font-serif text-center  tracking-[6px]">
-              Southeastern  Freight
-            </p>
-            <p className=" text-center font-serif  tracking-[6px]">
-              Lines
-            </p>
+          </div> 
+          // : 
+          // <div className="mt-4">
+          //   <p className=" mt-10 font-serif text-center  tracking-[6px]">
+          //     Southeastern  Freight
+          //   </p>
+          //   <p className=" text-center font-serif  tracking-[6px]">
+          //     Lines
+          //   </p>
 
-            <div className=" flex justify-center mt-5">
-              <img src={SeflLogo} alt="logo-sefl" className=" w-56 " />
-            </div>
-          </div>
+          //   <div className=" flex justify-center mt-5">
+          //     <img src={SeflLogo} alt="logo-sefl" className=" w-56 " />
+          //   </div>
+          // </div>
         }
 
 

@@ -6,7 +6,7 @@ const data: any = {
 }
 
 const imageData = createSlice({
-    name: "request",
+    name: "imageData",
     initialState: data,
     reducers: {
       changeImageData: (_state, action) => {
@@ -16,10 +16,10 @@ const imageData = createSlice({
       },
 
     
-        requestClearState: () => data,
+        clearState: () => data,
     },
 });
 
-export const {  changeImageData} =
+export const {  changeImageData,clearState} =
 imageData.actions;
 export default imageData.reducer;

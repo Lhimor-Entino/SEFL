@@ -9,7 +9,7 @@ const useCustomToast = () => {
     // //  TOAST THAT RETURNS A PROMISE
     // const confirmationToast = (title: string, description: string) => {
     //     return new Promise<boolean>((resolve) => {
-    //         hotToast.custom((t) => (
+    //         hotToast.custom((t:any) => (
     //             <div
     //                 className={`${t.visible ? 'opacity-100' : 'opacity-0'
     //                     } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-yellow-800 ring-opacity-5 transition-opacity duration-500`}
@@ -17,7 +17,7 @@ const useCustomToast = () => {
     //                 <div className="w-full p-4">
     //                     <div className="flex items-center">
     //                         <div className="flex-shrink-0 pt-0.5">
-    //                             <QuestionMarkCircledIcon className="w-10 h-10 text-yellow-700 animate-bounce" />
+    //                             <CircleHelpIcon className="w-10 h-10 text-yellow-700 animate-bounce" />
     //                         </div>
     //                         <div className="ml-3 flex-1">
     //                             <p className="text-sm font-medium text-yellow-700">{title}</p>
@@ -50,6 +50,12 @@ const useCustomToast = () => {
     //     });
     // };
 
+    const successToast = (title: string, description: string) => {
+        return toast.success(title, {
+            description: description,
+            duration: 2000
+        });
+    }
     const createdToast = (_title: string) => {
         // return toast({
         //     title: title,
@@ -116,7 +122,7 @@ const useCustomToast = () => {
         loadingToast,
         errorToast,
         closeToast,
-
+        successToast
         // confirmationToast
     }
 }

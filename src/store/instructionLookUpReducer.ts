@@ -5,7 +5,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const data: any = []
 
 const instructionLookup = createSlice({
-    name: "request",
+    name: "instructionLookup",
     initialState: data,
     reducers: {
       changeInstructionData: (_state, action) => {

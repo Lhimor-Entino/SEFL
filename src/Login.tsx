@@ -68,7 +68,7 @@ const Login = (_props: Props) => {
                 Cookies.set("user", user.username, coookie_options)
                 Cookies.set("role", response.data.details.authorities[0], coookie_options)
                 Cookies.set("client", response.data.details.clients[0], coookie_options)
-                Cookies.set("auto_request", "true", coookie_options)
+                Cookies.set("auto_request", "0", coookie_options)
                 navigate("/")
             }
 
@@ -109,12 +109,12 @@ const Login = (_props: Props) => {
                         <div className="grid w-full items-center gap-4">
                             <div className="flex flex-col space-y-1.5">
                                 <Label htmlFor="name">Username</Label>
-                                <Input autoFocus id="name" placeholder="Username" autoComplete="nofill" value={username} onChange={(e) => setUsername(e.target.value)} />
+                                <Input autoFocus id="name" style={{textTransform:"none"}} placeholder="Username" autoComplete="nofill" value={username} onChange={(e) => setUsername(e.target.value)} />
                             </div>
                             <div className="flex flex-col space-y-1.5">
                                 <Label htmlFor="name">Password</Label>
                                 <div className="relative">
-                                    <Input id="password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                                    <Input id="password" style={{textTransform:"none"}} type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
                                     {
                                         !showPassword ? <EyeIcon onClick={() => setShowPassword(!showPassword)} className="absolute top-2 right-2  hover:cursor-pointer" />
                                             : <EyeOffIcon onClick={() => setShowPassword(!showPassword)} className="absolute top-2 right-2 hover:cursor-pointer" />

@@ -10,6 +10,7 @@ import { removeRequestData } from "@/lib/cookieUtils";
 import { api } from "@/config";
 import { changeRequestData } from "@/store/entryDataReducer";
 import { BanIcon } from "lucide-react";
+import { changeImageData } from "@/store/imageReducer";
 
 
 
@@ -27,9 +28,20 @@ const useSaveEntry = () => {
 
         const token = Cookies.get("jt")
         const req_data = Cookies.get("request_data")
+
+        if(!req_data){
+            warningToast("Session Expired", "Please Relogin")
+            Cookies.remove("jt");
+            setTimeout(() => {
+                window.location.href = "/sefl/entry/auth"
+            }, 1000)
+
+            return
+        }
+
         const filename = JSON.parse(req_data || "").details.document
 
-
+        
         if (!token) {
             warningToast("Session Expired", "Please Relogin")
             setTimeout(() => {
@@ -53,7 +65,7 @@ const useSaveEntry = () => {
         try {
 
             const formData = entryDataRef.current
-
+            
             const response = await api.post(
                 `/document/save/${filename}`,
                 formData, // Data to be sent in the request body
@@ -74,6 +86,7 @@ const useSaveEntry = () => {
                 } else {
                     removeRequestData()
                     dispatch(changeRequestData({ newValue: {} }))
+                    dispatch(changeImageData({ newValue: "" }))
                 }
             }
         } catch (error: any) {
@@ -88,11 +101,12 @@ const useSaveEntry = () => {
                 }
                 if (error.response.data.status == "406") {
                     errorToast(error.response?.data.message, <div>
-                        <p>Required Field(s)</p>
+                        {/* <p>Required Field(s)</p> */}
                         {error.response?.data.details.map((d: any, index: number) => (
                             <div className="flex items-center mt-2 gap-x-2">
                                 <BanIcon className="w-4 h-4" />
                                 <p  key={index}>{d.field}</p>
+                                <p  key={index + d.message}>{d.message}</p>
                             </div>
 
                         ))}

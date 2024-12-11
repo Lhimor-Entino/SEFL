@@ -26,5 +26,5 @@ export const setAutoRequest = (value:string) => {
 
 export const isAutoRequest = () => {
     if(Cookies.get("auto_request") == "1") return true
-    return false
+    return false 
 }

@@ -34,6 +34,7 @@ function App() {
   // ** useShortcutKeys() ->  THIS HOOK IS CALLED IN THE ENTRYFROM COMPONENT **
   return (
     <div>
+      
       <RouterProvider router={router} />
     </div>
   )

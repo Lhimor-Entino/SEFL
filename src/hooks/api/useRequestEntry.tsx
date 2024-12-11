@@ -9,12 +9,11 @@ import { changeRequestData } from "@/store/entryDataReducer";
 
 import { changeImageData } from "@/store/imageReducer";
 
-import useInstructionLookup from "./useInstructionLookup";
 
 
 const useRequestEntry = () => {
     const { loadingToast, warningToast,  } = useCustomToast()
-    const {getInstructions} = useInstructionLookup()
+
     
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -77,7 +76,7 @@ const useRequestEntry = () => {
 
             dispatch(changeImageData({ newValue: url }))
             dispatch(changeRequestData({ newValue: response3.data }))
-            getInstructions()
+            
             setOngoingRequest(response1.data) // save ongoing request
             console.log(response3.data)
 

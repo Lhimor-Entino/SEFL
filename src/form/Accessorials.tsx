@@ -12,10 +12,10 @@ import {
 } from "@/components/ui/table"
 
 import useCustomToast from "@/hooks/useCustomToast"
-import { Accessorial_Type, isAccessorialTypeExist, Other_Type } from "@/lib/LookupUtil"
-import { addAccessorial, changeAccessorialData, setAccessorialData } from "@/store/entryDataReducer"
+import { Charges_Type, isAccessorialTypeExist } from "@/lib/LookupUtil"
+import { addAccessorial, changeAccessorialData, removeChargeItem, setAccessorialData } from "@/store/entryDataReducer"
 import { Accessorial, EntryData, } from "@/types"
-import {  CaptionsIcon, MousePointerClickIcon, PlusCircleIcon } from "lucide-react"
+import { CaptionsIcon, MousePointerClickIcon, PlusCircleIcon, Trash2Icon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
@@ -30,9 +30,12 @@ import {
 
 import { Badge } from "@/components/ui/badge"
 
-type Props = {}
+type Props = {
+    handleScrollToBottomCharge: () => void
+}
 
-const Accessorials = (_props: Props) => {
+const Accessorials = (props: Props) => {
+    const {handleScrollToBottomCharge} = props
     const itemInputClass = ` h-4 w-full text-slate-200 p-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0  border-0 focus:border-b-2  rounded-none text-xs `
     const entry_data_reducer: EntryData = useSelector((state: any) => state.entry_data_reducer);
     const instruction_data_reducer = useSelector((state: any) => state.instruction_data_reducer);
@@ -51,65 +54,41 @@ const Accessorials = (_props: Props) => {
             setSelectedIndex(index)
             return
         }
-        // if (property === "code") {
 
-        //     const filterSpecIns = specialInstructions?.filter((sp: any) => sp.ins_code === val)
-
-        //     if (!filterSpecIns) return
-        //     const newData: Accessorial = { code: filterSpecIns[0]?.ins_code, description: filterSpecIns[0]?.description }
-
-        //     console.log(newData)
-        //     dispatch(setAccessorialData({ index: index, newValue: newData }))
-        //     console.log(filterSpecIns)
-        // } 
         setSearch(val)
         dispatch(changeAccessorialData({ newValue: val, index, property: property }))
 
     }
 
-
-
     const handleAddAccessorial = () => {
         dispatch(addAccessorial())
         console.log(entry_data_reducer.accOrIns)
+        handleScrollToBottomCharge()
 
     }
-    // const onBlur = (val: string, index: number, property: keyof Accessorial) => {
-    //     switch (property) {
-    //         case 'code':
+    
+    const handleRemoveChargeItem = (index:number) => {
+        dispatch(removeChargeItem({index}))
+    }
 
-    //             if (showInstModal) return
-    //             let valid = isAccessorialTypeExist(instruction_data_reducer, val.toUpperCase())
-
-    //             if (!valid) {
-    //                 errorToast("Invalid Code", "Code does'nt exist", 3000)
-    //                 dispatch(changeAccessorialData({ newValue: null, index, property: property }))
-
-    //             }
-    //             console.log(valid)
-    //             //  dispatch(changeReferenceData({ newValue: val, index, property: property }))
-    //             break;
-
-    //         default:
-
-    //     }
-    // }
 
     const handleSelectInstruction = (ins_id: number) => {
 
         const filterSpecIns = specialInstructions?.filter((sp: any) => sp.id == ins_id)
         console.log(filterSpecIns)
         if (!filterSpecIns) return
-        const newData: Accessorial = { code: filterSpecIns[0]?.ins_code, description: filterSpecIns[0]?.description }
+        const newData: Accessorial = { code: filterSpecIns[0]?.code, description: filterSpecIns[0]?.description }
 
         console.log(newData)
         dispatch(setAccessorialData({ index: selectedIndex, newValue: newData }))
         console.log(filterSpecIns)
         setShowInstModal(false)
         dispatch(addAccessorial())
+        handleScrollToBottomCharge()
     }
     useEffect(() => {
-        const filtered = instruction_data_reducer.filter((ins: any) => ins.type == Accessorial_Type || ins.type == Other_Type)
+
+        const filtered = instruction_data_reducer.filter((ins: any) => ins.type === Charges_Type)
         console.log("FILTERED HERE 9393939", filtered)
         setSpecialInstructions(filtered)
     }, [instruction_data_reducer])
@@ -118,16 +97,21 @@ const Accessorials = (_props: Props) => {
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
         if (e.key === 'Tab') {
 
-            const filterSpecIns = specialInstructions?.filter((sp: any) => sp.ins_code === search.toUpperCase() || sp.charge_code === search.toUpperCase())
+            const filterSpecIns = specialInstructions?.filter((sp: any) => sp.code === search.toUpperCase())
 
             if (filterSpecIns.length == 1) {
-                const newData: Accessorial = { code: filterSpecIns[0]?.ins_code, description: filterSpecIns[0]?.description }
+                const newData: Accessorial = { code: filterSpecIns[0]?.code, description: filterSpecIns[0]?.description }
 
 
                 dispatch(setAccessorialData({ index: index, newValue: newData }))
                 dispatch(addAccessorial())
                 return
             } else {
+                setSelectedIndex(index)
+
+                e.preventDefault()
+                setShowInstModal(true)
+                if(search ==="") return 
                 // CHECK IF INPUTED
                 let valid = isAccessorialTypeExist(instruction_data_reducer, search.toUpperCase())
                 if (!valid) {
@@ -135,10 +119,6 @@ const Accessorials = (_props: Props) => {
                     dispatch(changeAccessorialData({ newValue: null, index, property: "code" }))
                 }
 
-                setSelectedIndex(index)
-
-                e.preventDefault()
-                setShowInstModal(true)
             }
 
 
@@ -171,7 +151,7 @@ const Accessorials = (_props: Props) => {
 
                             <TableHeader>
                                 <TableRow className="hover:bg-transparent">
-                                    <TableHead >Code</TableHead>
+                                    <TableHead >Code </TableHead>
                                     <TableHead >Description</TableHead>
                                     <TableHead >Action</TableHead>
 
@@ -179,23 +159,22 @@ const Accessorials = (_props: Props) => {
                             </TableHeader>
                             <TableBody>
                                 {
-                                    specialInstructions?.map((si: any, index: number) => si.type == Accessorial_Type && si.ins_code.includes(search)
-                                        || si.type === Other_Type && si.ins_code.includes(search) && (
-
-                                            <TableRow className="hover:bg-transparent" key={index} >
-                                                <TableCell className="text-white">
-                                                    <Badge>
-                                                        {si.ins_code || si.charge_code}
-                                                    </Badge>
-                                                </TableCell>
-                                                <TableCell >
-                                                    <p>{si.description}</p>
-                                                </TableCell>
-                                                <TableCell >
-                                                    <MousePointerClickIcon onClick={() => handleSelectInstruction(si.id)} className="cursor-pointer" />
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
+                                    specialInstructions?.map((si: any, index: number) => si.type == Charges_Type && si.code.includes(search) && (
+                                        <TableRow className="hover:bg-transparent" key={index} >
+                                            <TableCell className="text-white">
+                                                <Badge>
+                                                    {si.code}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell >
+                                                <p>{si.description}</p>
+                                                <p>{si.type}</p>
+                                            </TableCell>
+                                            <TableCell >
+                                                <MousePointerClickIcon onClick={() => handleSelectInstruction(si.id)} className="cursor-pointer" />
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
                                 }
 
 
@@ -212,7 +191,7 @@ const Accessorials = (_props: Props) => {
             <div className="flex justify-between">
                 <div className=" flex items-center gap-x-2">
                     <CaptionsIcon className=" w-5 h-5 text-white" />
-                    <p className="text-white font-bold">Accessorial </p>
+                    <p className="text-white font-bold"> Charge Codes </p>
                 </div>
 
                 <Button size={"sm"} onClick={() => handleAddAccessorial()} className="bg-slate-300  text-slate-900 hover:bg-slate-300">
@@ -224,8 +203,8 @@ const Accessorials = (_props: Props) => {
                 <TableHeader>
                     <TableRow className="hover:bg-transparent">
                         <TableHead className="w-20">CODE</TableHead>
-                        <TableHead className="min-w-[300px]">DESCRIPTION</TableHead>
-
+                        <TableHead className="min-w-[300px] w-[80%]">DESCRIPTION</TableHead>
+                        <TableHead className="text-right" >ACTION</TableHead>      
 
                     </TableRow>
                 </TableHeader>
@@ -253,7 +232,9 @@ const Accessorials = (_props: Props) => {
                                         onChange={({ target }) => handleChange(target.value, index, "description")}
                                     />
                                 </TableCell>
-
+                                <TableCell className=" flex justify-end">
+                                <Trash2Icon onClick={()=>handleRemoveChargeItem(index)}  className=" cursor-pointer w-4 h-5 mr-3 text-red-600"/>
+                                </TableCell>
 
 
                             </TableRow>
