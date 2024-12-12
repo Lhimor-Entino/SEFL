@@ -8,13 +8,14 @@ import { useDispatch } from "react-redux";
 import { changeRequestData } from "@/store/entryDataReducer";
 
 import { changeImageData } from "@/store/imageReducer";
+import useInstructionLookup from "./useInstructionLookup";
 
 
 
 const useRequestEntry = () => {
     const { loadingToast, warningToast,  } = useCustomToast()
+    const {getInstructions} = useInstructionLookup()
 
-    
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const dispatch = useDispatch()
@@ -79,9 +80,14 @@ const useRequestEntry = () => {
             
             setOngoingRequest(response1.data) // save ongoing request
             console.log(response3.data)
+            getInstructions()
 
         } catch (err: any) {
             setError(err.message || 'Unknown error');
+            console.log(err)
+            if(err.response?.data?.status == 400){
+                warningToast("Alert",err.response?.data?.message)
+            }
         } finally {
             toast.dismiss(toastId)
             setLoading(false);

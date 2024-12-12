@@ -86,7 +86,7 @@ const useRejectEntry = () => {
                     successToast("Entry Rejected", "The entry was successfully rejected, and new data has been automatically requested.");
                     
                 } else {
-          
+                    setRequestToDone()  // SET NEW REQUEST IS Done
                     removeRequestData()
                     dispatch(changeRequestData({ newValue: {} }))
                     dispatch(changeImageData({ newValue: "" }))
@@ -99,6 +99,7 @@ const useRejectEntry = () => {
 
         } catch (error: any) {
             errorToast('Cant connect to server', error.response?.data.message)
+            setRequestToDone()  // SET NEW REQUEST IS Done
         } finally {
             toast.dismiss(toastId)
             setLoading(false);

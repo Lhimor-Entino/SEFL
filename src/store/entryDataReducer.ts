@@ -56,6 +56,18 @@ const entryData = createSlice({
         (state.items[itemIndex] as WritableDraft<Items>)[property] = newValue;
       }
     },
+    setItemData: (state, action: PayloadAction<{
+      index: number;
+      newValue: Items;
+    }>) => {
+      const { index, newValue } = action.payload;
+      if (!state.items) return
+      if (state.items[index]) {
+
+        (state.items[index] as WritableDraft<Items>) = newValue;
+      }
+
+    },
     addItems: (state) => {
       const data_: Items = {
         charge: "",
@@ -208,6 +220,7 @@ const entryData = createSlice({
 });
 
 export const { 
+  setItemData,
   removeItem,
   removeChargeItem,
   removeReferenceItem,

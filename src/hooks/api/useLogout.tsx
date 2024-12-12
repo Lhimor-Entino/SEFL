@@ -25,22 +25,24 @@ const useLogout = () => {
       try {
         if (hasPendingRequest()) return // CHECK IF HAS PENDING API CALL
         const token = Cookies.get("jt")
-
+ 
         if(!token) {
           warningToast("Logged Out Automatically","Session Expired")
         
             navigate("/auth")
           
         }
+   
+   
+        const req_data =  Cookies.get("request_data") 
+        const filename = JSON.parse(req_data ||"").details.document
+          if(!filename){
+            return
+          }
         setLoading(true);
         setNewRequest()  // SET NEW REQUEST IS MADE
         toastId = loadingToast("Logging Out", "Please Wait ...")
         setLoading(true)
-   
-        const req_data =  Cookies.get("request_data") 
-        const filename = JSON.parse(req_data ||"").details.document
-        
-        
 
         const response = await api.get(`document/unlock/${filename}`, {
             headers: {
@@ -57,8 +59,12 @@ const useLogout = () => {
        
 
         }
-      } catch (error) {
-        
+      } catch (error:any) {
+        removeRequestData() 
+        removeToken()
+        dispatch(changeRequestData({newValue:{} }))
+        dispatch(changeImageData({newValue:{} }))
+        navigate("/auth")
       }finally{
         toast.dismiss(toastId)
         setLoading(false);

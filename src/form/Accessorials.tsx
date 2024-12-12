@@ -15,7 +15,7 @@ import useCustomToast from "@/hooks/useCustomToast"
 import { Charges_Type, isAccessorialTypeExist } from "@/lib/LookupUtil"
 import { addAccessorial, changeAccessorialData, removeChargeItem, setAccessorialData } from "@/store/entryDataReducer"
 import { Accessorial, EntryData, } from "@/types"
-import { CaptionsIcon, MousePointerClickIcon, PlusCircleIcon, Trash2Icon } from "lucide-react"
+import {  MousePointerClickIcon, PlusCircleIcon, Trash2Icon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
@@ -29,6 +29,7 @@ import {
 
 
 import { Badge } from "@/components/ui/badge"
+import { start_index } from "@/lib/generalUtil"
 
 type Props = {
     handleScrollToBottomCharge: () => void
@@ -188,14 +189,14 @@ const Accessorials = (props: Props) => {
             </Dialog>
 
 
-            <div className="flex justify-between">
-                <div className=" flex items-center gap-x-2">
+            <div className="flex justify-end">
+                {/* <div className=" flex items-center gap-x-2">
                     <CaptionsIcon className=" w-5 h-5 text-white" />
                     <p className="text-white font-bold"> Charge Codes </p>
-                </div>
+                </div> */}
 
                 <Button size={"sm"} onClick={() => handleAddAccessorial()} className="bg-slate-300  text-slate-900 hover:bg-slate-300">
-                    <PlusCircleIcon /> <p>Add Accessorial</p>
+                    <PlusCircleIcon /> <p>Add</p>
                 </Button>
             </div>
             <Table className="border-b-2">
@@ -211,12 +212,21 @@ const Accessorials = (props: Props) => {
                 <TableBody>
 
                     {
-                        entry_data_reducer.accOrIns?.map((rn: Accessorial, index: number) => (
+                        entry_data_reducer.accOrIns?.map((rn: Accessorial, index: number) => {
+
+                            const item_count = entry_data_reducer.items?.length
+                            const reference_count  = entry_data_reducer.referenceNumbers?.length
+
+                            const item_length = !item_count ? 0: item_count * 8 + start_index 
+                            const reference_length = !reference_count ? 0: reference_count * 5 
+                            const currentStartIndex =  item_length + reference_length   + index * 2; // The tabIndex for each row will increment based on the row position
+                        
+                            return  (
                             <TableRow className="hover:bg-transparent" >
                                 <TableCell className="text-white">
                                     <Input
                                         value={rn.code || ""}
-                                        //tabIndex={currentStartIndex + 2}
+                                        tabIndex={currentStartIndex + 1}
                                         className={`${itemInputClass}`}
                                         // onChange={({ target }) => (target.value)}
                                         onChange={({ target }) => handleChange(target.value, index, "code")}
@@ -227,7 +237,7 @@ const Accessorials = (props: Props) => {
                                 <TableCell className="text-white">
                                     <Input
                                         value={rn.description || ""}
-                                        //tabIndex={currentStartIndex + 2}
+                                        tabIndex={currentStartIndex + 2}
                                         className={`${itemInputClass}`}
                                         onChange={({ target }) => handleChange(target.value, index, "description")}
                                     />
@@ -238,7 +248,9 @@ const Accessorials = (props: Props) => {
 
 
                             </TableRow>
-                        ))
+                        )
+                        } 
+                        )
                     }
 
                 </TableBody>

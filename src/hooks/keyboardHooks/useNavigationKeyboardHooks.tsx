@@ -10,7 +10,7 @@ const useNavigationKeyboardHooks = () => {
         const handleKeyDown = (e: KeyboardEvent) => {
 
             // Get all input elements on the page
-            const focusableElements = 'input'; // You can adjust this to include more elements like buttons, etc.
+            const focusableElements = 'input,select'; // You can adjust this to include more elements like buttons, etc.
             const elements = Array.from(document.querySelectorAll(focusableElements)) as HTMLElement[];
 
             // Sort elements by tabIndex
@@ -28,6 +28,7 @@ const useNavigationKeyboardHooks = () => {
 
             if (e.key === 'Enter') {
                 e.preventDefault();
+               
                 // For Enter, focus the next element (if it exists)
                 const nextElement = sortedElements[currentElementIndex + 1];
                 if (nextElement) {

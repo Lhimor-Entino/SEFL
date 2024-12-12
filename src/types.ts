@@ -1,6 +1,6 @@
 export interface Items {
   charge?: string | null,
-  pieces?: string | number,
+  pieces?: string | number | null,
   hm?: string | null | number,
   ref?: string | null,
   description?: string | null,

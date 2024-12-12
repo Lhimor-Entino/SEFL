@@ -24,31 +24,32 @@ import References from "./References"
 import Accessorials from "./Accessorials"
 
 import useInstructionLookup from "@/hooks/api/useInstructionLookup"
-import { validateAccountField } from "@/lib/validationUtils"
-import { Instruction_Type } from "@/lib/LookupUtil"
+import { validateInputField } from "@/lib/validationUtils"
+import { Instruction_Type, isSHCTypeExist, isStateExist, } from "@/lib/LookupUtil"
+import useCustomToast from "@/hooks/useCustomToast"
 
+
+const inputClass = `text-slate-200 p-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0  text-xs border-0  border-b-4 border-slate-500 pl-2 rounded-sm focus:bg-slate-600`
+const inputClass2 = `text-slate-200 bg-transparent p-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-xs rounded-none border-0 pl-2  border-b-4 border-slate-500 rounded-sm  focus:bg-slate-600`
 type Props = {}
 
 function EntryForm({ }: Props) {
     const entry_data_reducer: EntryData = useSelector((state: any) => state.entry_data_reducer);
-
     const instruction_data_reducer = useSelector((state: any) => state.instruction_data_reducer);
     const dispatch = useDispatch();
     const { getInstructions } = useInstructionLookup()
-    const [specIns, setSpecIns] = useState<string>("")
 
-    const { divRef,divRef2,divRef3,handleScrollToBottomRef, handleScrollToBottom,handleScrollToBottomCharge } = useBottomDivAutoScroll()
+    const [specIns, setSpecIns] = useState<string>("")
+    const { divRef, divRef2, divRef3, handleScrollToBottomRef, handleScrollToBottom, handleScrollToBottomCharge } = useBottomDivAutoScroll()
     const [specialInstructions, setSpecialInstructions] = useState<any>()
     const [instOpen, setInstOpen] = useState<boolean>(true)
+    const { errorToast } = useCustomToast()
     const isFilled = (value: string) => {
 
         if (!value) return ''
         if (value.trim().length < 1) return ''
         return 'bg-slate-800'
     }
-    const inputClass = `text-slate-200 p-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0  text-xs border-0  border-b-4 border-slate-500 pl-2 rounded-sm focus:bg-slate-600`
-    const inputClass2 = `text-slate-200 bg-transparent p-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-xs rounded-none border-0 pl-2  border-b-4 border-slate-500 rounded-sm  focus:bg-slate-600`
-
 
     const handleAccountChange = (value: string, parent_property: string, child_property: string) => {
         const payload = { newValue: value, parent_property: parent_property, child_property: child_property, }
@@ -77,15 +78,65 @@ function EntryForm({ }: Props) {
         dispatch(updateInstruction({ newValue: filtered }))
     }
 
-    const validateField = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        let value = e.key
-        let res = validateAccountField(value)
-        if (res == "error") {
-            e.preventDefault()
+    const validateField = (e: React.KeyboardEvent<HTMLInputElement>, property?: string) => {
+
+
+        if (!property) {
+            // MEANS ACCOUNT
+            let value = e.key
+            let res = validateInputField(value)
+            if (res == "error") {
+                e.preventDefault()
+            }
+        } else {
+
         }
+
     }
 
+    const onBlur = (val: string, property: keyof EntryData, parent_property?:string) => {
 
+        switch (property) {
+            case 'shc':
+
+                if (val === "") return
+                let valid = isSHCTypeExist(instruction_data_reducer, val)
+
+                if (!valid) {
+                    errorToast("Invalid Code", "SHC Code does'nt exist", 3000)
+
+                    const payload = { newValue: null, property: property }
+                    dispatch(changeBillingInfo(payload))
+
+
+                    return
+                }
+
+                dispatch(changeBillingInfo({ newValue: val.toUpperCase(), property: property }))
+                break;
+
+            case 'state':
+
+                if (val === "") return
+                let valid_state = isStateExist(instruction_data_reducer, val)
+
+                if (!valid_state) {
+                    errorToast("Invalid Code", parent_property?.toUpperCase() + " STATE Code does'nt exist", 3000)
+                 
+                    dispatch(changeBillingAccountInfoData({ newValue: null, parent_property: parent_property, child_property: property, }))
+                 
+
+                    return
+                }
+
+               
+                dispatch(changeBillingAccountInfoData({ newValue: val, parent_property: parent_property, child_property: property, }))
+                 
+                break;
+            default:
+
+        }
+    }
 
 
     useEffect(() => {
@@ -104,12 +155,17 @@ function EntryForm({ }: Props) {
         const payload = { newValue: val.toString().charAt(0), property: "terms" }
         console.log(payload)
         dispatch(changeBillingInfo(payload))
-        getInstructions()
+
     }, [entry_data_reducer])
+
+    useEffect(() => {
+        getInstructions()
+    }, [])
+
 
 
     // BINDING
-    useShortcutKeys({ handleScrollToBottom,handleScrollToBottomRef,handleScrollToBottomCharge })
+    useShortcutKeys({ handleScrollToBottom, handleScrollToBottomRef, handleScrollToBottomCharge })
     return (
         <div className="h-[clamp(500px,80vh,1000px)] overflow-y-scroll entry__form mt-2 ">
 
@@ -117,6 +173,7 @@ function EntryForm({ }: Props) {
                 <div className="grid grid-flow-col space-y-1.5 space-x-2">
                     <Label htmlFor="proNumber" className="w-fit text-xs text-white" style={{ marginTop: "15px" }}>PRO : </Label>
                     <Input autoFocus id="proNumber"
+                        onKeyDown={(e) => validateField(e, "proNumber")}
                         onChange={({ target }) => handleOtherInfoChange(target.value, "proNumber")}
                         value={entry_data_reducer.proNumber || ''} tabIndex={1} style={{ height: "25px" }}
                         className={`${inputClass} ${isFilled(entry_data_reducer.proNumber || '')}`} />
@@ -181,6 +238,7 @@ function EntryForm({ }: Props) {
                             value={entry_data_reducer.shipper?.city || ''}
                             className={`  col-span-2 ${inputClass2} ${isFilled(entry_data_reducer.shipper?.city || '')}`} />
                         <Input id="shipTo_state" tabIndex={11}
+                            onBlur={() => onBlur(entry_data_reducer.shipper?.state || '', 'state',"shipper")}
                             onChange={({ target }) => handleAccountChange(target.value, "shipper", "state")}
                             value={entry_data_reducer.shipper?.state || ''}
                             className={`${inputClass2} ${isFilled(entry_data_reducer.shipper?.state || '')}`} />
@@ -214,6 +272,7 @@ function EntryForm({ }: Props) {
                             <Label htmlFor="date" className="w-fit text-white" style={{ marginTop: "15px" }}>DATE : </Label>
                             <Input id="date" tabIndex={15}
                                 onChange={({ target }) => handleOtherInfoChange(target.value, "date")}
+                                placeholder="mm/dd/yy"
                                 value={entry_data_reducer.date || ''} style={{ height: "25px" }}
                                 className={`${inputClass2} ${isFilled(entry_data_reducer.date || '')}`} />
                         </div>
@@ -222,6 +281,7 @@ function EntryForm({ }: Props) {
                     <div className="grid grid-flow-col space-y-1.5 gap-x-2">
                         <Label htmlFor="pickupDate" className="w-fit text-white" style={{ marginTop: "15px" }}> PICK UP DATE : </Label>
                         <Input id="pickupDate" tabIndex={16}
+                            placeholder="mm/dd/yy"
                             onChange={({ target }) => handleOtherInfoChange(target.value, "pickupDate")}
                             value={entry_data_reducer.pickupDate || ''} style={{ height: "25px" }}
                             className={`${inputClass2} ${isFilled(entry_data_reducer.pickupDate || '')}`} />
@@ -258,6 +318,7 @@ function EntryForm({ }: Props) {
                             value={entry_data_reducer.consignee?.city || ''}
                             className={` col-span-2 ${inputClass2} ${isFilled(entry_data_reducer.consignee?.city || '')}`} />
                         <Input id="consignee.state" tabIndex={22}
+                          onBlur={() => onBlur(entry_data_reducer.consignee?.state || '', 'state',"consignee")}
                             onChange={({ target }) => handleAccountChange(target.value, "consignee", "state")}
                             value={entry_data_reducer.consignee?.state || ''}
                             className={` ${inputClass2} ${isFilled(entry_data_reducer.consignee?.city || '')}`} />
@@ -338,6 +399,7 @@ function EntryForm({ }: Props) {
                             value={entry_data_reducer.billTo?.city || ''}
                             className={` col-span-2 ${inputClass2} ${isFilled(entry_data_reducer.billTo?.city || '')}`} />
                         <Input id="billto.state" tabIndex={34}
+                          onBlur={() => onBlur(entry_data_reducer.billTo?.state || '', 'state',"billTo")}
                             onChange={({ target }) => handleAccountChange(target.value, "billTo", "state")}
                             value={entry_data_reducer.billTo?.state || ''}
                             className={` ${inputClass2} ${isFilled(entry_data_reducer.billTo?.state || '')}`} />
@@ -364,11 +426,55 @@ function EntryForm({ }: Props) {
                             className={` ${inputClass2} ${isFilled(entry_data_reducer.bills?.toString() || '')}`} />
                     </div>
                     <div className="grid grid-flow-col space-y-1.5">
-                        <Label htmlFor="ship" className="w-fit text-white" style={{ marginTop: "15px" }}>SHC : </Label>
-                        <Input id="ship" tabIndex={38}
+                        <Label htmlFor="SHC" className="w-fit text-white" style={{ marginTop: "15px" }}>SHC : </Label>
+                        <Input id="SHC" tabIndex={38}
+                            onBlur={() => onBlur(entry_data_reducer.shc || "", "shc")}
                             onChange={({ target }) => handleOtherInfoChange(target.value, "shc")}
                             value={entry_data_reducer.shc || ''} style={{ height: "25px" }}
                             className={` ${inputClass2} ${isFilled(entry_data_reducer.shc || '')}`} />
+
+                        {/* <Popover  >
+                            <PopoverTrigger className="text-white w-full ">
+
+                                <Input id="SHC" tabIndex={38}
+                                    onFocus={() => { }}
+                                    onChange={({ target }) => handleOtherInfoChange(target.value, "shc")}
+                                    value={entry_data_reducer.shc || ''} style={{ height: "25px" }}
+                                    className={` ${inputClass2} ${isFilled(entry_data_reducer.shc || '')}`} />
+
+                            </PopoverTrigger>
+                            <PopoverContent className="w-full flex gap-y-3 flex-col">
+                                <p>SHC Codes</p>
+                                <div className="flex gap-x-2">
+                                    {
+                                        instruction_data_reducer?.map((ins: any, index: number) => ins.type === "SHC" && (
+                                            <Button key={index} >
+                                                {ins.code}
+                                            </Button>
+                                        ))
+                                    }
+                                </div>
+
+                            </PopoverContent>
+                        </Popover> */}
+                        {/* <Select onValueChange={(value) => handleShcChange(value)}  >
+                            <SelectTrigger className="w-[180px] bg-transparent h-5 p-2 py-3 text-white">
+                                <SelectValue tabIndex={38} placeholder="Select Code" className="bg-transparent" />
+                            </SelectTrigger>
+                            <SelectContent >
+                                <SelectGroup>
+                                    <SelectLabel className="bg-slate-400 text-white rounded-sm">SHC LIST</SelectLabel>
+
+                                    {
+                                        instruction_data_reducer.map((ins: any, _index: number) => ins.type === Shc &&
+                                            <SelectItem value={ins.code} className="aria-selected:bg-blue-500 aria-selected:text-white data-[highlighted]:bg-slate-700 data-[highlighted]:text-white">{ins.code}</SelectItem>
+                                        )
+                                    }
+                                </SelectGroup>
+
+
+                            </SelectContent>
+                        </Select> */}
                     </div>
                 </div>
             </div>
@@ -377,7 +483,7 @@ function EntryForm({ }: Props) {
 
                 <div className="grid grid-flow-col space-y-1.5 relative">
 
-                    <Label htmlFor="ship" className="w-fit text-white" style={{ marginTop: "15px" }}>SPEC INS : </Label>
+                    <Label htmlFor="ship" className="w-fit text-white" style={{ marginTop: "15px" }}>SPEC INS: </Label>
 
 
                     <Input id="ship" value={specIns} onChange={({ target }) => setSpecIns(target.value)} tabIndex={39} style={{ height: "25px" }}
@@ -390,7 +496,7 @@ function EntryForm({ }: Props) {
                                     <CommandGroup heading="Instructions">
                                         {
                                             specialInstructions.map((ins: any, index: number) =>
-                                                 ins.code.includes(specIns.toUpperCase()) && (
+                                                ins.code.includes(specIns.toUpperCase()) && (
                                                     <CommandItem key={index}> <Button size={"sm"} className="w-full text-xs " onClick={() => handleAddInstruction(ins)}>{ins.description}</Button></CommandItem>
                                                 )
                                             )
@@ -441,19 +547,21 @@ function EntryForm({ }: Props) {
 
                 {
                     entry_data_reducer?.specialInstructions?.map((ins: any, index: number) => (
-                        <div className="flex items-center gap-x-2 mt-2">
+                        <div className="flex items-center gap-x-2 mt-1">
+                            <Trash2Icon onClick={() => removeSpecialInstruction(index)} className="text-red-600 w-8 h-8 cursor-pointer hover:bg-slate-800 p-2 rounded-full" />
                             <p className="text-white text-[.8rem]" key={index}>  {ins}</p>
-                            <Trash2Icon onClick={() => removeSpecialInstruction(index)} className="text-red-600 w-4 h-4 cursor-pointer" />
+
                         </div>)
                     )
                 }
 
             </div>
-            
-            <References handleScrollToBottomRef={handleScrollToBottomRef} />
-            <div ref={divRef2} className="mb-36  -mt-20" ></div>
+
+
             <Items handleScrollToBottom={handleScrollToBottom} />
-            <div ref={divRef} className=" mb-36  -mt-20" ></div>
+            <div ref={divRef} className="mb-36  -mt-20" ></div>
+            <References handleScrollToBottomRef={handleScrollToBottomRef} />
+            <div ref={divRef2} className=" mb-36  -mt-20" ></div>
             <Accessorials handleScrollToBottomCharge={handleScrollToBottomCharge} />
             <div ref={divRef3} className="mb-16 border-2  " ></div>
             {/* Placeholder for the bottom to scroll to */}

@@ -7,7 +7,7 @@ import {
   MenubarShortcut,
   MenubarTrigger,
 } from "@/components/ui/menubar"
-import { ArrowLeftCircleIcon, ArrowRightCircleIcon,BookmarkXIcon,FileCog2Icon, FlipHorizontal2Icon, HardDriveDownloadIcon, ListRestartIcon, PencilLine, RadioTowerIcon, RefreshCcwDot, RefreshCcwIcon, Rotate3dIcon, RotateCcwIcon, ViewIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react"
+import { ArrowLeftCircleIcon, ArrowRightCircleIcon,BookMarkedIcon,BookmarkXIcon,FileCog2Icon, FlipHorizontal2Icon, HardDriveDownloadIcon, KeyboardMusicIcon, LayoutListIcon, ListRestartIcon, PencilLine, RadioTowerIcon, RefreshCcwDot, RefreshCcwIcon, Rotate3dIcon, RotateCcwIcon, ScrollTextIcon, ViewIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react"
 import useSaveEntry from "./hooks/api/useSaveEntry"
 import useRequestEntry from "./hooks/api/useRequestEntry"
 import { hasPendingRequest, isAutoRequest, setAutoRequest } from "./lib/requestValidationUtil"
@@ -18,13 +18,14 @@ import { useEffect, useRef, useState } from "react"
 
 import { changeModalData } from "./store/modalReducer"
 import { useDispatch } from "react-redux"
+import useInstructionLookup from "./hooks/api/useInstructionLookup"
 type Props = {}
 
 const TopBar = (_props: Props) => {
   const { saveEntry } = useSaveEntry()
   const dispatch = useDispatch()
   const { request } = useRequestEntry()
-
+  const {getInstructions} = useInstructionLookup()
   const [isAuto,setIsAuto] = useState<boolean>()
   const autoRef = useRef(isAuto)
   const handleChange = () => {
@@ -71,9 +72,9 @@ const TopBar = (_props: Props) => {
               <BookmarkXIcon className="h-4 w-4 mr-2" />  Reject <MenubarShortcut>F3</MenubarShortcut>
             </MenubarItem> 
             <MenubarItem
-            //disabled={requesting} onClick={() => reloadData()}
+            disabled={hasPendingRequest()} onClick={() => getInstructions()}
             >
-              <ListRestartIcon className="h-4 w-4 mr-2" />  Reload Data <MenubarShortcut>⌘+F7</MenubarShortcut>
+              <ListRestartIcon className="h-4 w-4 mr-2" />  Reload Instruction <MenubarShortcut className="ml-3">⌘+F7</MenubarShortcut>
             </MenubarItem>
 
           </MenubarContent>
@@ -149,7 +150,29 @@ const TopBar = (_props: Props) => {
           </MenubarContent>
         </MenubarMenu>
 
+        <MenubarMenu>
+          <MenubarTrigger className="  text-slate-900"> <KeyboardMusicIcon className="w-4 h-4 mr-2" /> Hot Keys</MenubarTrigger>
+          <MenubarContent >
+            <MenubarItem
+            //disabled={requesting} 
+            >
+              <BookMarkedIcon className="w-4 h-4 mr-2" />
+              Add Reference <MenubarShortcut>Alt + A</MenubarShortcut>
+            </MenubarItem>
 
+        
+            <MenubarItem>
+            <LayoutListIcon className="w-4 h-4 mr-2" />
+            Add Item <MenubarShortcut>Ctrl + Insert</MenubarShortcut>
+            </MenubarItem>
+            <MenubarItem>
+            <ScrollTextIcon className="w-4 h-4 mr-2 " />
+            Add Accessorials <MenubarShortcut className="ml-5" >Ctrl + Insert</MenubarShortcut>
+            </MenubarItem>
+            <MenubarSeparator />
+
+          </MenubarContent>
+        </MenubarMenu>
 
       </Menubar>
 

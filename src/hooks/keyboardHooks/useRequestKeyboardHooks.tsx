@@ -9,6 +9,7 @@ import { hasOngoingRequest } from '@/lib/requestValidationUtil';
 import { hasLoginUser } from '@/lib/cookieUtils';
 import { useDispatch } from 'react-redux';
 import { changeModalData } from '@/store/modalReducer';
+import useInstructionLookup from '../api/useInstructionLookup';
 
 
 
@@ -18,6 +19,7 @@ const useRequestKeyboardHooks = () => {
     const { saveEntry } = useSaveEntry(); // Call your custom hook
     // Use the custom hook to fetch the data
     const { request } = useRequestEntry();
+    const {getInstructions} = useInstructionLookup()
     const  dispatch = useDispatch();
 
     useEffect(() => {
@@ -69,6 +71,20 @@ const useRequestKeyboardHooks = () => {
 
                 }
                 dispatch(changeModalData({property:"rejectModal"}))
+               
+            }
+            if (e.ctrlKey && e.key === 'F7') {
+                e.preventDefault();
+                if (!hasLoginUser()) {
+                    warningToast("Session Expired", "Please Relogin")
+                    setTimeout(() => {
+                        window.location.href = "/sefl/entry/auth"
+                    }, 1000)
+
+                    return
+
+                }
+                getInstructions()
                
             }
         };

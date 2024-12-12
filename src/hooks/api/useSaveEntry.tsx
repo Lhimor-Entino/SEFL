@@ -11,6 +11,7 @@ import { api } from "@/config";
 import { changeRequestData } from "@/store/entryDataReducer";
 import { BanIcon } from "lucide-react";
 import { changeImageData } from "@/store/imageReducer";
+import { itemHasTTL } from "@/lib/validationUtils";
 
 
 
@@ -51,6 +52,11 @@ const useSaveEntry = () => {
             return
         }
 
+        if(!itemHasTTL(entryDataRef.current)){
+            errorToast("Save Failed", "Please provide a value for TTL before saving.", 3000);
+
+            return
+        }
 
         setLoading(true);
         setError(null);
@@ -65,7 +71,8 @@ const useSaveEntry = () => {
         try {
 
             const formData = entryDataRef.current
-            
+            console.log(formData)
+         
             const response = await api.post(
                 `/document/save/${filename}`,
                 formData, // Data to be sent in the request body

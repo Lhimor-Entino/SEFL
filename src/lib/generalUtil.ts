@@ -1,0 +1,1 @@
+export const start_index = 43; // START TAB INDEX IN TABLE (THIS IS THE INPUT COUNT BEFORE TABLES)

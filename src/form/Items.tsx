@@ -7,29 +7,62 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Button } from "../components/ui/button"
-import { LayoutListIcon, PlusCircleIcon, Trash2Icon } from "lucide-react"
+import { LayoutListIcon, MousePointerClickIcon, PlusCircleIcon, Trash2Icon } from "lucide-react"
 import { EntryData, Items as ItemType } from "../types"
 import { useDispatch, useSelector } from "react-redux"
-import { addItems, changeItemData, removeItem } from "../store/entryDataReducer"
+import { addItems, changeItemData, removeItem, setItemData } from "../store/entryDataReducer"
 import { Input } from "../components/ui/input"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Charges_Type, isAccessorialTypeExist } from "@/lib/LookupUtil"
+import { useEffect, useState } from "react"
+import { Badge } from "@/components/ui/badge"
+import useCustomToast from "@/hooks/useCustomToast"
+import { start_index } from "@/lib/generalUtil"
 
 type Props = {
     handleScrollToBottom: () => void
 }
+const inputClass = ` text-slate-800 p-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0  text-xs border-0  pl-2 rounded-sm bg-slate-100 focus:bg-slate-200`
+
 const itemInputClass = ` h-4 w-full text-slate-200 p-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0  border-0 focus:border-b-2  rounded-none text-xs `
 const Items = (props: Props) => {
 
     const { handleScrollToBottom } = props
 
     const entry_data_reducer: EntryData = useSelector((state: any) => state.entry_data_reducer);
+    const instruction_data_reducer = useSelector((state: any) => state.instruction_data_reducer);
+    const [specialInstructions, setSpecialInstructions] = useState<any>()
+    const [showInstModal, setShowInstModal] = useState<boolean>(false)
+    const [selectedIndex, setSelectedIndex] = useState<number>(0)
+    const [search, setSearch] = useState<string>("")
     const dispatch = useDispatch()
-    let start_index = 43;
+    const { errorToast } = useCustomToast()
+  
+
+    const validForLookup = (index: number) => {
+        if (!entry_data_reducer.items) return
+        let data = entry_data_reducer.items[index]
+        if (!data.weight && !data.description &&!data.pieces ) {
+
+            return true
+        }
+
+    }
     const handleAddItem = () => {
         dispatch(addItems())
         handleScrollToBottom()
     }
     const handleChangeItem = (value: string, itemIndex: number, property: keyof ItemType) => {
 
+        if (value === "?") {
+            let valid = validForLookup(itemIndex);
+            if (!valid) return
+            setShowInstModal(true)
+            setSelectedIndex(itemIndex)
+            return
+        }
+
+        setSearch(value)
         dispatch(changeItemData({ newValue: value, itemIndex, property: property }))
 
     }
@@ -37,19 +70,150 @@ const Items = (props: Props) => {
     const handleRemoveItem = (index: number) => {
         dispatch(removeItem({ index }))
     }
+    const handleSelectInstruction = (ins_id: number) => {
+        
+        const filterSpecIns = specialInstructions?.filter((sp: any) => sp.id == ins_id)
+        console.log(filterSpecIns)
+        if (!filterSpecIns) return
+        const newData:ItemType = {
+            charge: filterSpecIns[0]?.code,
+            pieces: null,
+            hm: null,
+            ref: null,
+            description: filterSpecIns[0]?.description,
+            weight: null,
+            sqYds: null,
+            class: null,
+        }
 
+    
+        dispatch(setItemData({ index: selectedIndex, newValue: newData }))
+        console.log(filterSpecIns)
+        setShowInstModal(false)
+        dispatch(addItems())
+        setSearch("")
+        // handleScrollToBottomCharge()
+    }
+
+        // Handle Tab key press to open the modal
+        const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+            if (e.key === 'Tab') {
+                
+                let valid = validForLookup(index);
+                if (!valid) return
+                const filterSpecIns = specialInstructions?.filter((sp: any) => sp.code === search.toUpperCase())
+
+                if (filterSpecIns.length == 1) {
+                    const newData:ItemType = {
+                        charge: filterSpecIns[0]?.code,
+                        pieces: null,
+                        hm: null,
+                        ref: null,
+                        description: filterSpecIns[0]?.description,
+                        weight: null,
+                        sqYds: null,
+                        class: null,
+                    }
+                    dispatch(setItemData({ index: index, newValue: newData }))
+                    dispatch(addItems())
+                    setSearch("")
+                    return
+                } else {
+                    setSelectedIndex(index)
+    
+                    e.preventDefault()
+                    setShowInstModal(true)
+                    if(search ==="") return 
+                    // CHECK IF INPUTED
+                    let valid = isAccessorialTypeExist(instruction_data_reducer, search.toUpperCase())
+                    
+                    if (!valid) {
+                        errorToast("Invalid Code", "Code does'nt exist", 3000)
+                        dispatch(changeItemData({ newValue: null, itemIndex:index, property: "charge" }))
+                    }
+    
+                }
+    
+    
+    
+    
+            }
+        };
+
+    useEffect(() => {
+
+        const filtered = instruction_data_reducer.filter((ins: any) => ins.type === Charges_Type)
+
+        setSpecialInstructions(filtered)
+    }, [instruction_data_reducer])
     return (
         <div className="mt-14">
+            {/* INSTRUCTION MODAL */}
+            <Dialog open={showInstModal} onOpenChange={() => setShowInstModal(!showInstModal)}>
+
+                <DialogContent className="sm:max-w-[600px] w-[600px] ">
+                    <DialogHeader>
+                        <DialogTitle>Charges Codes</DialogTitle>
+                        <DialogDescription>
+                            List of Charges Codes
+                            <div className="flex items-center gap-x-2  mt-3 ">
+
+                                <Input placeholder="Search code . . ." value={search} className={`${inputClass}`} onChange={({ target }) => setSearch(target.value.toLocaleUpperCase())} />
+                            </div>
+
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="max-h-96 overflow-scroll">
+
+                        <Table className="border-b-2 mt-1">
+
+                            <TableHeader>
+                                <TableRow className="hover:bg-transparent">
+                                    <TableHead >Code </TableHead>
+                                    <TableHead >Description</TableHead>
+                                    <TableHead >Action</TableHead>
+
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {
+                                    specialInstructions?.map((si: any, index: number) => si.type == Charges_Type && si.code.includes(search) && (
+                                        <TableRow className="hover:bg-transparent" key={index} >
+                                            <TableCell className="text-white">
+                                                <Badge>
+                                                    {si.code}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell >
+                                                <p>{si.description}</p>
+                                                <p>{si.type}</p>
+                                            </TableCell>
+                                            <TableCell >
+                                                <MousePointerClickIcon onClick={() => handleSelectInstruction(si.id)} className="cursor-pointer" />
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                }
+
+
+
+                            </TableBody>
+                        </Table>
+
+                    </div>
+
+                </DialogContent>
+            </Dialog>
             <div className="flex justify-between">
                 <div className=" flex items-center gap-x-2">
                     <LayoutListIcon className=" w-4 h-4 text-white" />
                     <p className="text-white font-bold">Items </p>
                 </div>
                 <Button size={"sm"} onClick={() => handleAddItem()} className="bg-slate-300  text-slate-900 hover:bg-slate-300">
-                    <PlusCircleIcon /> <p>Add Item</p>
+                    <PlusCircleIcon /> <p>Add</p>
                 </Button>
             </div>
-            <Table>
+            <Table className="border-b-2 border-white">
 
                 <TableHeader>
                     <TableRow className="hover:bg-transparent">
@@ -71,7 +235,7 @@ const Items = (props: Props) => {
                             const currentStartIndex = start_index + index * 8; // The tabIndex for each row will increment based on the row position
                             return (
                                 <TableRow className="hover:bg-transparent" key={index}>
-                                    <TableCell><Input tabIndex={currentStartIndex + 1} className={`${itemInputClass}`} onChange={({ target }) => handleChangeItem(target.value, index, "charge")} value={item.charge || ""} /> </TableCell>
+                                    <TableCell><Input tabIndex={currentStartIndex + 1} className={`${itemInputClass}`}    onKeyDown={(e) => handleKeyDown(e, index)} onChange={({ target }) => handleChangeItem(target.value, index, "charge")} value={item.charge || ""} /> </TableCell>
                                     <TableCell><Input tabIndex={currentStartIndex + 2} className={`${itemInputClass}`} onChange={({ target }) => handleChangeItem(target.value, index, "pieces")} value={item.pieces || ""} /></TableCell>
                                     <TableCell><Input tabIndex={currentStartIndex + 3} className={`${itemInputClass}`} onChange={({ target }) => handleChangeItem(target.value, index, "hm")} value={item.hm || ""} /></TableCell>
                                     <TableCell><Input tabIndex={currentStartIndex + 4} className={`${itemInputClass}`} onChange={({ target }) => handleChangeItem(target.value, index, "ref")} value={item.ref || ""} /></TableCell>

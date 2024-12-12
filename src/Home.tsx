@@ -27,11 +27,11 @@ import { useEffect, useState } from "react"
 import Cookies from "js-cookie"
 import { useNavigate } from "react-router-dom"
 import useRequestEntry from "./hooks/api/useRequestEntry"
-import useInstructionLookup from "./hooks/api/useInstructionLookup"
+
 
 import { useSelector } from "react-redux"
 import RejectModal from "./modals/RejectModal"
-// import useRefreshToken from "./hooks/api/useRefershToken"
+import useRefreshToken from "./hooks/api/useRefershToken"
 
 type Props = {}
 
@@ -41,15 +41,15 @@ const Home = (_props: Props) => {
   const image_data_reducer = useSelector((state: any) => state.image_data_reducer);
   const modal_data_reducer = useSelector((state: any) => state.modal_data_reducer);
   const { request } = useRequestEntry()
-  // const {refreshToken} = useRefreshToken()
-  const { getInstructions } = useInstructionLookup()
+  const {refreshToken} = useRefreshToken()
+  
   const [currentImage, setCurrentImage] = useState<string>("")
   const [showRejectModal, setShowRejectModal] = useState<boolean>(false)
+  
   // AUTO REQUEST
   useEffect(() => {
     setTimeout(() => {
       request()
-      getInstructions()
     }, 100);
   }, [])
 
@@ -73,14 +73,12 @@ const Home = (_props: Props) => {
 
 
   // //  REFRESH TOKEN
-  // useEffect(() => {
-
-
-  //   // Set up the interval to run the function every 9 minutes (540,000 milliseconds) 540000
-  //   const intervalId = setInterval(refreshToken,5000 );
-  //   // Clean up the interval on component unmount
-  //   return () => clearInterval(intervalId);
-  // }, []);
+  useEffect(() => {
+    // Set up the interval to run the function every 9 minutes (540,000 milliseconds) 540000
+    const intervalId = setInterval(refreshToken,540000 );
+    // Clean up the interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []);
   return (
     <>
       {/* MODALS */}
@@ -102,7 +100,7 @@ const Home = (_props: Props) => {
                     </BreadcrumbItem>
                     <BreadcrumbSeparator className="hidden md:block" />
                     <BreadcrumbItem>
-                      <BreadcrumbPage className='font-semibold text-slate-700' onClick={() => getInstructions()}>Data Entry </BreadcrumbPage>
+                      <BreadcrumbPage className='font-semibold text-slate-700'>Data Entry </BreadcrumbPage>
                     </BreadcrumbItem>
                   </BreadcrumbList>
                 </Breadcrumb>

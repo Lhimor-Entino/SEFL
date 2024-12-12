@@ -12,7 +12,7 @@ export const useRefreshToken = () => {
         if(!token){
             errorToast("Refresh token failed","No token found")
         }
-        const response = await api.get(`/credential/refresh-token`, {
+        const response = await api.post(`/credential/refresh-token`,{}, {
           headers: {
             'Authorization': `Bearer ${token}`, // Authorization header
             'Content-Type': 'application/json' // Set content type if needed

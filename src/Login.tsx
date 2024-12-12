@@ -69,6 +69,7 @@ const Login = (_props: Props) => {
                 Cookies.set("role", response.data.details.authorities[0], coookie_options)
                 Cookies.set("client", response.data.details.clients[0], coookie_options)
                 Cookies.set("auto_request", "0", coookie_options)
+              
                 navigate("/")
             }
 
