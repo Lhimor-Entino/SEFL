@@ -7,7 +7,7 @@ import {
   MenubarShortcut,
   MenubarTrigger,
 } from "@/components/ui/menubar"
-import { ArrowLeftCircleIcon, ArrowRightCircleIcon,BookMarkedIcon,BookmarkXIcon,FileCog2Icon, FlipHorizontal2Icon, HardDriveDownloadIcon, KeyboardMusicIcon, LayoutListIcon, ListRestartIcon, PencilLine, RadioTowerIcon, RefreshCcwDot, RefreshCcwIcon, Rotate3dIcon, RotateCcwIcon, ScrollTextIcon, ViewIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react"
+import { ArrowDownFromLineIcon, ArrowLeftCircleIcon, ArrowLeftFromLineIcon, ArrowRightCircleIcon, ArrowRightFromLineIcon, ArrowUpCircleIcon, ArrowUpFromLineIcon, BookMarkedIcon, BookmarkXIcon, FileCog2Icon, FlipHorizontal2Icon, HardDriveDownloadIcon, KeyboardMusicIcon, LayoutListIcon, ListRestartIcon, PencilLine, RadioTowerIcon, RefreshCcwDot, RefreshCcwIcon, Rotate3dIcon, RotateCcwIcon, ScrollTextIcon, ViewIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react"
 import useSaveEntry from "./hooks/api/useSaveEntry"
 import useRequestEntry from "./hooks/api/useRequestEntry"
 import { hasPendingRequest, isAutoRequest, setAutoRequest } from "./lib/requestValidationUtil"
@@ -25,29 +25,29 @@ const TopBar = (_props: Props) => {
   const { saveEntry } = useSaveEntry()
   const dispatch = useDispatch()
   const { request } = useRequestEntry()
-  const {getInstructions} = useInstructionLookup()
-  const [isAuto,setIsAuto] = useState<boolean>()
+  const { getInstructions } = useInstructionLookup()
+  const [isAuto, setIsAuto] = useState<boolean>()
   const autoRef = useRef(isAuto)
   const handleChange = () => {
-    if(!Cookies.get("auto_request")){
+    if (!Cookies.get("auto_request")) {
       setAutoRequest("1")
       return
     }
-    if(Cookies.get("auto_request") == "1"){
+    if (Cookies.get("auto_request") == "1") {
       setAutoRequest("0")
-    }else{
+    } else {
       setAutoRequest("1")
     }
 
     setIsAuto(isAutoRequest())
   }
   useEffect(() => {
-    let is_auto : boolean = isAutoRequest()
-  
+    let is_auto: boolean = isAutoRequest()
+
 
     setIsAuto(is_auto)
     autoRef.current = is_auto
-  },[])
+  }, [])
   return (
     <div className="flex gap-x-5">
       <Menubar className="border-none text-white dark:text-slate-950 " >
@@ -65,14 +65,14 @@ const TopBar = (_props: Props) => {
             >
               <RadioTowerIcon className="h-4 w-4 mr-2" />  Request <MenubarShortcut>F1</MenubarShortcut>
             </MenubarItem>
-             <MenubarItem
-              disabled={hasPendingRequest()} 
-              onClick={() =>dispatch(changeModalData({property:"rejectModal"}))}
+            <MenubarItem
+              disabled={hasPendingRequest()}
+              onClick={() => dispatch(changeModalData({ property: "rejectModal" }))}
             >
               <BookmarkXIcon className="h-4 w-4 mr-2" />  Reject <MenubarShortcut>F3</MenubarShortcut>
-            </MenubarItem> 
+            </MenubarItem>
             <MenubarItem
-            disabled={hasPendingRequest()} onClick={() => getInstructions()}
+              disabled={hasPendingRequest()} onClick={() => getInstructions()}
             >
               <ListRestartIcon className="h-4 w-4 mr-2" />  Reload Instruction <MenubarShortcut className="ml-3">⌘+F7</MenubarShortcut>
             </MenubarItem>
@@ -122,6 +122,30 @@ const TopBar = (_props: Props) => {
               <ArrowLeftCircleIcon className="h-4 w-4 mr-2" />  Prev Image <MenubarShortcut>Ctrl + 🡠
               </MenubarShortcut>
             </MenubarItem>
+            <MenubarItem
+            // disabled={requesting} onClick={() => changeImg(currentPageRef.current - 1)}
+            >
+              <ArrowLeftFromLineIcon className="h-4 w-4 mr-2" />Move Left <MenubarShortcut>Shift + 🡠
+              </MenubarShortcut>
+            </MenubarItem>
+            <MenubarItem
+            // disabled={requesting} onClick={() => changeImg(currentPageRef.current - 1)}
+            >
+              <ArrowRightFromLineIcon className="h-4 w-4 mr-2" />Move Right <MenubarShortcut>Shift + 🡢
+              </MenubarShortcut>
+            </MenubarItem>
+               <MenubarItem
+            // disabled={requesting} onClick={() => changeImg(currentPageRef.current - 1)}
+            >
+              <ArrowUpFromLineIcon className="h-4 w-4 mr-2" />Move Up <MenubarShortcut>Shift +  🡡
+              </MenubarShortcut>
+            </MenubarItem>
+            <MenubarItem
+            // disabled={requesting} onClick={() => changeImg(currentPageRef.current - 1)}
+            >
+              <ArrowDownFromLineIcon className="h-4 w-4 mr-2" />Move Down <MenubarShortcut>Shift +  🡣
+              </MenubarShortcut>
+            </MenubarItem>
           </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>
@@ -159,25 +183,33 @@ const TopBar = (_props: Props) => {
               <BookMarkedIcon className="w-4 h-4 mr-2" />
               Add Reference <MenubarShortcut>Alt + A</MenubarShortcut>
             </MenubarItem>
-
-        
             <MenubarItem>
-            <LayoutListIcon className="w-4 h-4 mr-2" />
-            Add Item <MenubarShortcut>Ctrl + Insert</MenubarShortcut>
+              <ScrollTextIcon className="w-4 h-4 mr-2 " />
+              Add Accessorials <MenubarShortcut className="ml-5" >Alt + C</MenubarShortcut>
             </MenubarItem>
             <MenubarItem>
-            <ScrollTextIcon className="w-4 h-4 mr-2 " />
-            Add Accessorials <MenubarShortcut className="ml-5" >Ctrl + Insert</MenubarShortcut>
+              <LayoutListIcon className="w-4 h-4 mr-2" />
+              Add Item <MenubarShortcut>Ctrl + Insert</MenubarShortcut>
             </MenubarItem>
-            <MenubarSeparator />
-
+            <MenubarItem>
+              <ArrowRightCircleIcon className="w-4 h-4 mr-2" />
+             Next Field <MenubarShortcut>Arrow Up</MenubarShortcut>
+            </MenubarItem>
+            <MenubarItem>
+              <ArrowLeftCircleIcon className="w-4 h-4 mr-2" />
+             Prev Field <MenubarShortcut>Arrow Down</MenubarShortcut>
+            </MenubarItem>
+            <MenubarItem>
+              <ArrowUpCircleIcon className="w-4 h-4 mr-2" />
+             Scroll Top<MenubarShortcut>Ctrl + Alt + T</MenubarShortcut>
+            </MenubarItem>
           </MenubarContent>
         </MenubarMenu>
 
       </Menubar>
 
       <div className="flex items-center space-x-2">
-        <Switch id="airplane-mode" onClick={()=> handleChange()} checked={isAuto}/>
+        <Switch id="airplane-mode" onClick={() => handleChange()} checked={isAuto} />
         <Label htmlFor="airplane-mode">Auto Request</Label>
       </div>
     </div>

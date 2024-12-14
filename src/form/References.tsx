@@ -13,6 +13,7 @@ import {
 import useCustomToast from "@/hooks/useCustomToast"
 import { start_index } from "@/lib/generalUtil"
 import { isReferenceTypeExist } from "@/lib/LookupUtil"
+import { checkNullItems } from "@/lib/validationUtils"
 import { addReference, changeReferenceData, removeReferenceItem } from "@/store/entryDataReducer"
 import { EntryData, ReferenceNumbers } from "@/types"
 import { BookMarkedIcon, PlusCircleIcon, Trash2Icon } from "lucide-react"
@@ -46,7 +47,9 @@ const References = (props: Props) => {
                     dispatch(changeReferenceData({ newValue: null, index, property: property }))
                     return
                 }
+                if (!checkNullItems(entry_data_reducer.referenceNumbers)) {
                 dispatch(addReference())
+                }
                 //  dispatch(changeReferenceData({ newValue: val, index, property: property }))
                 break;
 
@@ -54,11 +57,32 @@ const References = (props: Props) => {
 
         }
     }
-    const handleAddRerefence = () => {
-        handleScrollToBottomRef()
-        dispatch(addReference())
-        console.log(entry_data_reducer.referenceNumbers)
 
+    const onValueFieldKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Tab' || e.key === "Enter" || e.key === "ArrowDown") {
+            // Get all input elements on the page
+            const focusableElements = 'input,select'; // You can adjust this to include more elements like buttons, etc.
+            const elements = Array.from(document.querySelectorAll(focusableElements)) as HTMLElement[];
+
+            // Sort elements by tabIndex
+            const sortedElements = elements
+                .filter((element) => element.tabIndex > 0) // Only consider elements with a positive tabIndex
+                .sort((a, b) => a.tabIndex - b.tabIndex);  // Sort by tabIndex in ascending order
+
+            const currentElement = document.activeElement as HTMLElement | null;
+            if (!currentElement) return;
+            const currentElementIndex = sortedElements.indexOf(currentElement);
+
+            const nextElement = sortedElements[currentElementIndex + 3];
+            if (nextElement) {
+                nextElement.focus();
+            }
+
+        }
+    }
+    const handleAddRerefence = () => {
+            handleScrollToBottomRef()
+            dispatch(addReference())
     }
 
     const handleRemoveReferenceItem = (index: number) => {
@@ -97,8 +121,8 @@ const References = (props: Props) => {
                     {
                         entry_data_reducer.referenceNumbers?.map((rn: ReferenceNumbers, index: number) => {
                             const item_count = entry_data_reducer.items?.length
-                            const item_length = !item_count ? 0: item_count * 8 + start_index 
-                            
+                            const item_length = !item_count ? 0 : item_count * 8 + start_index
+
                             const currentStartIndex = item_length + index * 5; // The tabIndex for each row will increment based on the row position
                             return (
                                 <TableRow className="hover:bg-transparent" key={index} >
@@ -106,17 +130,18 @@ const References = (props: Props) => {
                                         <Input
                                             value={rn.id || ""}
                                             tabIndex={currentStartIndex + 1}
-                                            className={`${itemInputClass}`}
+                                            className={`${itemInputClass} reference-input`}
                                             onChange={({ target }) => handleChange(target.value, index, "id")}
                                             onBlur={() => onBlur(rn.id || "", index, "id")}
                                         />
-                                   
+
                                     </TableCell>
                                     <TableCell className="text-white">
                                         <Input
+                                            onKeyDown={ onValueFieldKeyDown}
                                             value={rn.value || ""}
                                             tabIndex={currentStartIndex + 2}
-                                            className={`${itemInputClass}`}
+                                            className={`${itemInputClass} reference-input`}
                                             onChange={({ target }) => handleChange(target.value, index, "value")}
                                         />
                                     </TableCell>
@@ -124,7 +149,7 @@ const References = (props: Props) => {
                                         <Input
                                             value={rn.pieces || ""}
                                             tabIndex={currentStartIndex + 3}
-                                            className={`${itemInputClass}`}
+                                            className={`${itemInputClass} reference-input`}
                                             onChange={({ target }) => handleChange(target.value, index, "pieces")}
 
                                         />
@@ -133,7 +158,7 @@ const References = (props: Props) => {
                                         <Input
                                             value={rn.weight || ""}
                                             tabIndex={currentStartIndex + 4}
-                                            className={`${itemInputClass}`}
+                                            className={`${itemInputClass} reference-input`}
                                             onChange={({ target }) => handleChange(target.value, index, "weight")}
 
                                         />
@@ -142,7 +167,7 @@ const References = (props: Props) => {
                                         <Input
                                             value={rn.relatedValue || ""}
                                             tabIndex={currentStartIndex + 5}
-                                            className={`${itemInputClass}`}
+                                            className={`${itemInputClass} reference-input`}
                                             onChange={({ target }) => handleChange(target.value, index, "relatedValue")}
 
                                         />

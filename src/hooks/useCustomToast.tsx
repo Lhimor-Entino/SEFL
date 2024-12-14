@@ -111,7 +111,7 @@ const useCustomToast = () => {
     }
     const closeToast = (toastId: string) => {
         // After your operation completes, dismiss the toast
-        alert(toastId)
+
         toast.dismiss(toastId);
     };
  

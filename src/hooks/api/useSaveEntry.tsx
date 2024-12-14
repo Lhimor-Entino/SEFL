@@ -11,7 +11,7 @@ import { api } from "@/config";
 import { changeRequestData } from "@/store/entryDataReducer";
 import { BanIcon } from "lucide-react";
 import { changeImageData } from "@/store/imageReducer";
-import { itemHasTTL } from "@/lib/validationUtils";
+import { checkIfProIsNulloRInvalid, itemHasTTL } from "@/lib/validationUtils";
 
 
 
@@ -50,13 +50,20 @@ const useSaveEntry = () => {
             }, 1000)
 
             return
-        }
+        }   
+        // console.log(entryDataRef.current)
 
         if(!itemHasTTL(entryDataRef.current)){
             errorToast("Save Failed", "Please provide a value for TTL before saving.", 3000);
 
             return
         }
+
+        if(checkIfProIsNulloRInvalid(entryDataRef.current)){
+            errorToast("Save Failed", "Pro Number empty / Invalid length.", 3000);
+            return
+        }
+  
 
         setLoading(true);
         setError(null);

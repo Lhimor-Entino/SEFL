@@ -17,7 +17,8 @@ import { Charges_Type, isAccessorialTypeExist } from "@/lib/LookupUtil"
 import { useEffect, useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import useCustomToast from "@/hooks/useCustomToast"
-import { start_index } from "@/lib/generalUtil"
+import { focusNextInput, start_index } from "@/lib/generalUtil"
+import { checkNullItems } from "@/lib/validationUtils"
 
 type Props = {
     handleScrollToBottom: () => void
@@ -37,20 +38,23 @@ const Items = (props: Props) => {
     const [search, setSearch] = useState<string>("")
     const dispatch = useDispatch()
     const { errorToast } = useCustomToast()
-  
+    const [currentIndex, setCurrentIndex] = useState<number>(0)
 
     const validForLookup = (index: number) => {
         if (!entry_data_reducer.items) return
         let data = entry_data_reducer.items[index]
-        if (!data.weight && !data.description &&!data.pieces ) {
+        if (!data.weight && !data.description && !data.pieces) {
 
             return true
         }
 
     }
     const handleAddItem = () => {
+
         dispatch(addItems())
         handleScrollToBottom()
+
+
     }
     const handleChangeItem = (value: string, itemIndex: number, property: keyof ItemType) => {
 
@@ -71,11 +75,11 @@ const Items = (props: Props) => {
         dispatch(removeItem({ index }))
     }
     const handleSelectInstruction = (ins_id: number) => {
-        
+
         const filterSpecIns = specialInstructions?.filter((sp: any) => sp.id == ins_id)
         console.log(filterSpecIns)
         if (!filterSpecIns) return
-        const newData:ItemType = {
+        const newData: ItemType = {
             charge: filterSpecIns[0]?.code,
             pieces: null,
             hm: null,
@@ -86,60 +90,83 @@ const Items = (props: Props) => {
             class: null,
         }
 
-    
+
         dispatch(setItemData({ index: selectedIndex, newValue: newData }))
         console.log(filterSpecIns)
         setShowInstModal(false)
-        dispatch(addItems())
+        if (!checkNullItems(entry_data_reducer.items)) {
+            dispatch(addItems())
+        }
         setSearch("")
+        // focusNextInput(currentIndex)
         // handleScrollToBottomCharge()
     }
 
-        // Handle Tab key press to open the modal
-        const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-            if (e.key === 'Tab') {
-                
-                let valid = validForLookup(index);
-                if (!valid) return
-                const filterSpecIns = specialInstructions?.filter((sp: any) => sp.code === search.toUpperCase())
+    // Handle Tab key press to open the modal
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number, currentIndex: number) => {
 
-                if (filterSpecIns.length == 1) {
-                    const newData:ItemType = {
-                        charge: filterSpecIns[0]?.code,
-                        pieces: null,
-                        hm: null,
-                        ref: null,
-                        description: filterSpecIns[0]?.description,
-                        weight: null,
-                        sqYds: null,
-                        class: null,
-                    }
-                    dispatch(setItemData({ index: index, newValue: newData }))
-                    dispatch(addItems())
-                    setSearch("")
-                    return
-                } else {
-                    setSelectedIndex(index)
-    
-                    e.preventDefault()
-                    setShowInstModal(true)
-                    if(search ==="") return 
-                    // CHECK IF INPUTED
-                    let valid = isAccessorialTypeExist(instruction_data_reducer, search.toUpperCase())
-                    
-                    if (!valid) {
-                        errorToast("Invalid Code", "Code does'nt exist", 3000)
-                        dispatch(changeItemData({ newValue: null, itemIndex:index, property: "charge" }))
-                    }
-    
+        if (e.key === 'Tab' || e.key === "Enter" || e.key === "ArrowDown") {
+            if (search === "") return
+            setCurrentIndex(currentIndex)
+            let valid = validForLookup(index);
+            if (!valid) return
+            const filterSpecIns = specialInstructions?.filter((sp: any) => sp.code === search.toUpperCase())
+
+            if (filterSpecIns.length == 1) {
+                const newData: ItemType = {
+                    charge: filterSpecIns[0]?.code,
+                    pieces: null,
+                    hm: null,
+                    ref: null,
+                    description: filterSpecIns[0]?.description,
+                    weight: null,
+                    sqYds: null,
+                    class: null,
                 }
-    
-    
-    
-    
-            }
-        };
+                dispatch(setItemData({ index: index, newValue: newData }))
 
+                if (!checkNullItems(entry_data_reducer.items)) {
+                    dispatch(addItems())
+                }
+                setSearch("")
+                return
+            } else {
+                if (search === "") return
+                setSelectedIndex(index)
+
+                e.preventDefault()
+                setShowInstModal(true)
+
+                // CHECK IF INPUTED
+                let valid = isAccessorialTypeExist(instruction_data_reducer, search.toUpperCase())
+
+                if (!valid) {
+                    errorToast("Invalid Code", "Code does'nt exist", 3000)
+                    dispatch(changeItemData({ newValue: null, itemIndex: index, property: "charge" }))
+                }
+
+            }
+
+
+
+
+        }
+    };
+
+    const handleClose = () => {
+
+
+        setShowInstModal(!showInstModal)
+        
+
+        // Delay focus to ensure the DOM has updated
+        setTimeout(() => {
+            focusNextInput(currentIndex)
+            
+        }, 0); // Delay by 0ms to push it to the next event loop cycle
+
+
+    }
     useEffect(() => {
 
         const filtered = instruction_data_reducer.filter((ins: any) => ins.type === Charges_Type)
@@ -149,7 +176,7 @@ const Items = (props: Props) => {
     return (
         <div className="mt-14">
             {/* INSTRUCTION MODAL */}
-            <Dialog open={showInstModal} onOpenChange={() => setShowInstModal(!showInstModal)}>
+            <Dialog open={showInstModal} onOpenChange={() => handleClose()}>
 
                 <DialogContent className="sm:max-w-[600px] w-[600px] ">
                     <DialogHeader>
@@ -196,7 +223,6 @@ const Items = (props: Props) => {
                                 }
 
 
-
                             </TableBody>
                         </Table>
 
@@ -235,14 +261,14 @@ const Items = (props: Props) => {
                             const currentStartIndex = start_index + index * 8; // The tabIndex for each row will increment based on the row position
                             return (
                                 <TableRow className="hover:bg-transparent" key={index}>
-                                    <TableCell><Input tabIndex={currentStartIndex + 1} className={`${itemInputClass}`}    onKeyDown={(e) => handleKeyDown(e, index)} onChange={({ target }) => handleChangeItem(target.value, index, "charge")} value={item.charge || ""} /> </TableCell>
-                                    <TableCell><Input tabIndex={currentStartIndex + 2} className={`${itemInputClass}`} onChange={({ target }) => handleChangeItem(target.value, index, "pieces")} value={item.pieces || ""} /></TableCell>
-                                    <TableCell><Input tabIndex={currentStartIndex + 3} className={`${itemInputClass}`} onChange={({ target }) => handleChangeItem(target.value, index, "hm")} value={item.hm || ""} /></TableCell>
-                                    <TableCell><Input tabIndex={currentStartIndex + 4} className={`${itemInputClass}`} onChange={({ target }) => handleChangeItem(target.value, index, "ref")} value={item.ref || ""} /></TableCell>
-                                    <TableCell><Input tabIndex={currentStartIndex + 5} className={`${itemInputClass}`} onChange={({ target }) => handleChangeItem(target.value, index, "description")} value={item.description || ""} /></TableCell>
-                                    <TableCell><Input tabIndex={currentStartIndex + 6} className={`${itemInputClass}`} onChange={({ target }) => handleChangeItem(target.value, index, "weight")} value={item.weight || ""} /></TableCell>
-                                    <TableCell><Input tabIndex={currentStartIndex + 7} className={`${itemInputClass}`} onChange={({ target }) => handleChangeItem(target.value, index, "sqYds")} value={item.sqYds || ""} /></TableCell>
-                                    <TableCell><Input tabIndex={currentStartIndex + 8} className={`${itemInputClass}`} onChange={({ target }) => handleChangeItem(target.value, index, "class")} value={item.class || ""} /></TableCell>
+                                    <TableCell><Input  tabIndex={currentStartIndex + 1} className={`${itemInputClass} item-input`} onKeyDown={(e) => handleKeyDown(e, index, currentStartIndex + 1)} onChange={({ target }) => handleChangeItem(target.value, index, "charge")} value={item.charge || ""} /> </TableCell>
+                                    <TableCell><Input tabIndex={currentStartIndex + 2} className={`${itemInputClass} item-input`} onChange={({ target }) => handleChangeItem(target.value, index, "pieces")} value={item.pieces || ""} /></TableCell>
+                                    <TableCell><Input tabIndex={currentStartIndex + 3} className={`${itemInputClass} item-input`} onChange={({ target }) => handleChangeItem(target.value, index, "hm")} value={item.hm || ""} /></TableCell>
+                                    <TableCell><Input tabIndex={currentStartIndex + 4} className={`${itemInputClass} item-input`} onChange={({ target }) => handleChangeItem(target.value, index, "ref")} value={item.ref || ""} /></TableCell>
+                                    <TableCell><Input tabIndex={currentStartIndex + 5} className={`${itemInputClass} item-input`} onChange={({ target }) => handleChangeItem(target.value, index, "description")} value={item.description || ""} /></TableCell>
+                                    <TableCell><Input tabIndex={currentStartIndex + 6} className={`${itemInputClass} item-input`} onChange={({ target }) => handleChangeItem(target.value, index, "weight")} value={item.weight || ""} /></TableCell>
+                                    <TableCell><Input tabIndex={currentStartIndex + 7} className={`${itemInputClass} item-input`} onChange={({ target }) => handleChangeItem(target.value, index, "sqYds")} value={item.sqYds || ""} /></TableCell>
+                                    <TableCell><Input tabIndex={currentStartIndex + 8} className={`${itemInputClass} item-input`} onChange={({ target }) => handleChangeItem(target.value, index, "class")} value={item.class || ""} /></TableCell>
                                     <TableCell className=" flex justify-end">
                                         <Trash2Icon onClick={() => handleRemoveItem(index)} className=" cursor-pointer w-4 h-5 mr-3 text-red-600" />
                                     </TableCell>

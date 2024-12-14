@@ -29,7 +29,8 @@ import {
 
 
 import { Badge } from "@/components/ui/badge"
-import { start_index } from "@/lib/generalUtil"
+import { focusNextInput, start_index } from "@/lib/generalUtil"
+import { checkNullItems } from "@/lib/validationUtils"
 
 type Props = {
     handleScrollToBottomCharge: () => void
@@ -47,7 +48,7 @@ const Accessorials = (props: Props) => {
     const [selectedIndex, setSelectedIndex] = useState<number>(0)
     const [search, setSearch] = useState<string>("")
     const inputClass = ` text-slate-800 p-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0  text-xs border-0  pl-2 rounded-sm bg-slate-100 focus:bg-slate-200`
-
+    const [currentIndex, setCurrentIndex] = useState<number>(0)
     const handleChange = (val: string, index: number, property: keyof Accessorial) => {
 
         if (val === "?") {
@@ -63,7 +64,7 @@ const Accessorials = (props: Props) => {
 
     const handleAddAccessorial = () => {
         dispatch(addAccessorial())
-        console.log(entry_data_reducer.accOrIns)
+      
         handleScrollToBottomCharge()
 
     }
@@ -84,8 +85,27 @@ const Accessorials = (props: Props) => {
         dispatch(setAccessorialData({ index: selectedIndex, newValue: newData }))
         console.log(filterSpecIns)
         setShowInstModal(false)
-        dispatch(addAccessorial())
+
+        if (!checkNullItems(entry_data_reducer.accOrIns)) {
+            dispatch(addAccessorial())
+        }
+       
         handleScrollToBottomCharge()
+    }
+
+    
+    const handleClose = () => {
+
+
+        setShowInstModal(!showInstModal)
+        
+
+        // Delay focus to ensure the DOM has updated
+        setTimeout(() => {
+            focusNextInput(currentIndex)
+        }, 0); // Delay by 0ms to push it to the next event loop cycle
+
+
     }
     useEffect(() => {
 
@@ -95,24 +115,28 @@ const Accessorials = (props: Props) => {
     }, [instruction_data_reducer])
 
     // Handle Tab key press to open the modal
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-        if (e.key === 'Tab') {
-
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number,currentIndex:number) => {
+        if (e.key === 'Tab' || e.key === "Enter" || e.key === "ArrowDown") {
+            if(search ==="") return 
+            setCurrentIndex(currentIndex)
             const filterSpecIns = specialInstructions?.filter((sp: any) => sp.code === search.toUpperCase())
 
             if (filterSpecIns.length == 1) {
                 const newData: Accessorial = { code: filterSpecIns[0]?.code, description: filterSpecIns[0]?.description }
-
-
                 dispatch(setAccessorialData({ index: index, newValue: newData }))
-                dispatch(addAccessorial())
+                if (!checkNullItems(entry_data_reducer.accOrIns)) {
+                    dispatch(addAccessorial())
+                }
+               
+            
                 return
             } else {
+                if(search ==="") return 
                 setSelectedIndex(index)
 
                 e.preventDefault()
                 setShowInstModal(true)
-                if(search ==="") return 
+             
                 // CHECK IF INPUTED
                 let valid = isAccessorialTypeExist(instruction_data_reducer, search.toUpperCase())
                 if (!valid) {
@@ -132,7 +156,7 @@ const Accessorials = (props: Props) => {
     return (
         <div className="mt-14">
             {/* INSTRUCTION MODAL */}
-            <Dialog open={showInstModal} onOpenChange={() => setShowInstModal(!showInstModal)}>
+            <Dialog open={showInstModal} onOpenChange={handleClose}>
 
                 <DialogContent className="sm:max-w-[600px] w-[600px] ">
                     <DialogHeader>
@@ -227,18 +251,18 @@ const Accessorials = (props: Props) => {
                                     <Input
                                         value={rn.code || ""}
                                         tabIndex={currentStartIndex + 1}
-                                        className={`${itemInputClass}`}
+                                        className={`${itemInputClass} accessorial-input`}
                                         // onChange={({ target }) => (target.value)}
                                         onChange={({ target }) => handleChange(target.value, index, "code")}
                                         // onBlur={() => onBlur(rn.code || "", index, "code")}
-                                        onKeyDown={(e) => handleKeyDown(e, index)}
+                                        onKeyDown={(e) => handleKeyDown(e, index,currentStartIndex + 1)}
                                     />
                                 </TableCell>
                                 <TableCell className="text-white">
                                     <Input
                                         value={rn.description || ""}
                                         tabIndex={currentStartIndex + 2}
-                                        className={`${itemInputClass}`}
+                                        className={`${itemInputClass} accessorial-input`}
                                         onChange={({ target }) => handleChange(target.value, index, "description")}
                                     />
                                 </TableCell>

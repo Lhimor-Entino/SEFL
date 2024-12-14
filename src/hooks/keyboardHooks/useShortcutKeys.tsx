@@ -1,19 +1,21 @@
 
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { addAccessorial, addItems, addReference } from '@/store/entryDataReducer';
+import { addAccessorial, addItems, addReference, deleteAllAccessorial, deleteAllInstruction, deleteAllItems, deleteAllReference } from '@/store/entryDataReducer';
 import useImage from '../api/useImage';
+import { focusNextInput } from '@/lib/generalUtil';
 
 
 interface Props{
     handleScrollToBottom : () => void
     handleScrollToBottomRef: () =>  void
     handleScrollToBottomCharge: () =>void
+    handleScrollToTop: () =>void
 }
 
 
 const useShortcutKeys = (props:Props) => {
-    const { handleScrollToBottom,handleScrollToBottomRef,handleScrollToBottomCharge} = props
+    const { handleScrollToBottom,handleScrollToBottomRef,handleScrollToBottomCharge,handleScrollToTop} = props
     const { refetchImg, nextImage } = useImage()
 
     const dispatch = useDispatch()
@@ -21,13 +23,22 @@ const useShortcutKeys = (props:Props) => {
 
         // Define the event handler
         const handleKeyDown = (e: KeyboardEvent) => {
-
+          
             // API SHORTCUT KEYS  
             if (e.ctrlKey && e.key == "Insert" ) {
                 e.preventDefault()
                 dispatch(addItems())
               
                     handleScrollToBottom(); // Trigger scroll
+                
+            }
+            // SCROLL TO TOP
+            if (e.ctrlKey && e.altKey && e.key.toUpperCase() === "T" ) {
+                
+                e.preventDefault()
+             
+                handleScrollToTop(); // Trigger scroll
+                focusNextInput(0)
                 
             }
             if (e.altKey && e.key.toUpperCase() == "A"    ) {
@@ -42,14 +53,39 @@ const useShortcutKeys = (props:Props) => {
                 dispatch(addAccessorial())
                 handleScrollToBottomCharge()
             }
-
             if (e.key == "F4") {
                 e.preventDefault()
                 refetchImg()
             }
-
             if (e.ctrlKey && e.key == "ArrowRight") {
                 nextImage(1)
+            }
+
+            //DATA SHORTCUT KEYS
+
+            if(e.ctrlKey && e.shiftKey && e.key =="Delete"){
+                e.preventDefault()
+                   // Get the currently focused element
+            const currentElement = document.activeElement as HTMLElement | null;
+     
+            if(currentElement?.id ==="spec_ins"){ // MEANS ACTION COMES FOR SPEC INS FIELD
+                dispatch(deleteAllInstruction())
+                return
+            }
+          
+            if(currentElement?.classList.contains("item-input")){
+              dispatch(deleteAllItems())
+              return
+            }
+            if(currentElement?.classList.contains("reference-input")){
+                dispatch(deleteAllReference())
+                return
+              }
+              if(currentElement?.classList.contains("accessorial-input")){
+                dispatch(deleteAllAccessorial())
+                return
+              }
+             
             }
         };
 

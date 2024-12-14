@@ -133,7 +133,7 @@ export default class ReactPanZoom extends React.PureComponent<
         onTouchStart={this.onTouchStart}
         onTouchMove={this.onTouchMove}
         onTouchEnd={this.onTouchEnd}
-        onMouseMove={this.onMouseMove}
+        // onMouseMove={this.onMouseMove}
         onWheel={this.onWheel}
         onMouseEnter={this.onMouseEnter}
         onMouseLeave={this.onMouseLeave}
@@ -216,9 +216,10 @@ export default class ReactPanZoom extends React.PureComponent<
     e.returnValue = false;
   }
 
-  private onMouseMove = (e: React.MouseEvent<EventTarget>) => {
-    this.updateMousePosition(e.pageX, e.pageY);
-  };
+  // private onMouseMove = (e: React.MouseEvent<EventTarget>) => {
+  //   this.updateMousePosition(e.pageX, e.pageY);
+
+  // };
 
   private onWheel = (e: React.WheelEvent<EventTarget>) => {
     Math.sign(e.deltaY) < 0
@@ -257,5 +258,72 @@ export default class ReactPanZoom extends React.PureComponent<
     matrixData[4] = dragData.dx - deltaX;
     matrixData[5] = dragData.dy - deltaY;
     return matrixData;
+  };
+
+  componentDidMount() {
+    document.addEventListener('keydown', this.handleKeyDown);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.handleKeyDown);
+  }
+
+  // SHORTCUT KEYS BINDING
+  private handleKeyDown = (event: KeyboardEvent) => {
+    if (event.shiftKey && event.key === 'ArrowLeft') {
+      this.moveLeft();
+      event.preventDefault();
+    }
+    if (event.shiftKey && event.key === 'ArrowRight') {
+      this.moveRight();
+      event.preventDefault();
+    }
+    if (event.shiftKey && event.key === 'ArrowUp') {
+      event.preventDefault();
+      event.stopPropagation(); // Ensure no other handlers interfere
+      this.moveUp();
+
+    }
+    if (event.shiftKey && event.key === 'ArrowDown') {
+      event.preventDefault();
+      event.stopPropagation(); // Ensure no other handlers interfere
+      this.moveDown();
+
+    }
+  };
+
+  private updatePanContainer = (matrixData: number[]) => {
+    if (this.panContainer) {
+      this.panContainer.style.transform = `matrix(${matrixData.toString()})`;
+    }
+    if (this.props.onPan) {
+      this.props.onPan(matrixData[4], matrixData[5]);
+    }
+  };
+
+  private moveLeft = () => {
+    const matrixData = [...this.state.matrixData];
+    matrixData[4] -= 20; // Move left by 10 units (adjust as needed)
+    this.setState({ matrixData });
+    this.updatePanContainer(matrixData)
+  };
+  private moveRight = () => {
+    const matrixData = [...this.state.matrixData];
+    matrixData[4] += 20; // Move left by 10 units (adjust as needed)
+    this.setState({ matrixData });
+    this.updatePanContainer(matrixData)
+  };
+
+  private moveUp = () => {
+    const matrixData = [...this.state.matrixData];
+    matrixData[5] -= 20; // Move left by 10 units (adjust as needed)
+    this.setState({ matrixData });
+    this.updatePanContainer(matrixData)
+  };
+  private moveDown = () => {
+    const matrixData = [...this.state.matrixData];
+    matrixData[5] += 20; // Move left by 10 units (adjust as needed)
+    this.setState({ matrixData });
+    this.updatePanContainer(matrixData)
   };
 }

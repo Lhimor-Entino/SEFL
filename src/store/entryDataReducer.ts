@@ -215,11 +215,35 @@ const entryData = createSlice({
       state.items = filtered
 
     },
+    deleteAllInstruction : (state) => { 
+      if (state.specialInstructions !== null) {  
+        state.specialInstructions = []
+      }
+    },
+    deleteAllItems: (state) => {
+      if (state.items !== null) {  
+        state.items = []
+      }
+    },
+    deleteAllReference: (state) => {
+      if (state.referenceNumbers !== null) {  
+        state.referenceNumbers = []
+      }
+    },
+    deleteAllAccessorial: (state) => {
+      if (state.accOrIns !== null) {  
+        state.accOrIns = []
+      }
+    },
     requestClearState: () => data,
   },
 });
 
 export const { 
+  deleteAllAccessorial,
+  deleteAllReference,
+  deleteAllInstruction,
+  deleteAllItems,
   setItemData,
   removeItem,
   removeChargeItem,

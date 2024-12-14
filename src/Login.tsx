@@ -31,6 +31,7 @@ const Login = (_props: Props) => {
     const [loading, setLoading] = useState<boolean>(false)
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const {errorToast } = useCustomToast()
+    
     const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
         setLoading(true)
@@ -130,7 +131,7 @@ const Login = (_props: Props) => {
                     </form>
                 </CardContent>
                 <CardFooter className="flex justify-end">
-                    <Button form="login" className="w-full bg-slate-900 hover:bg-red-900 dark:text-white" type="submit"> {loading ? <div className="flex items-center"><Loader2Icon color={"#fff"} className="w-4 h-4 animate-spin mr-2" /> <span className={cn(loading ? "animate-pulse" : '')}> Logging In ... </span></div> : "Login"}</Button>
+                    <Button form="login" disabled={password.trim().length < 1 || username.trim().length < 1 ? true :false} className="w-full bg-slate-900 hover:bg-red-900 dark:text-white" type="submit"> {loading ? <div className="flex items-center"><Loader2Icon color={"#fff"} className="w-4 h-4 animate-spin mr-2" /> <span className={cn(loading ? "animate-pulse" : '')}> Logging In ... </span></div> : "Login"}</Button>
                 </CardFooter>
             </Card>
 

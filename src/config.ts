@@ -2,7 +2,8 @@ import axios from "axios";
 import { CookieAttributes } from "node_modules/@types/js-cookie";
 
 const now = new Date();
-const expireTime = now.getTime() + 24 * 60 * 60 * 1000; // 1 day in milliseconds
+const expireTime = now.getTime() + 4 * 60 * 60 * 1000; // 4 hours in milliseconds
+
 const expirationDate = new Date(expireTime);
 export const coookie_options: CookieAttributes = {
   expires: expirationDate,

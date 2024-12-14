@@ -65,13 +65,17 @@ const useRequestEntry = () => {
                     'Authorization': `Bearer ${token}`
                 }
             })
-            await api.post(`/document/start-process/${filename}`, {}, {
-                headers: {
-                    'Authorization': `Bearer ${token}`, // Authorization header
-                    'Content-Type': 'application/json' // Set content type if needed
-                }
-            })
 
+            // IF ALREADY REQUESTED DON'T EXECUTE THIS
+         //   if(!Cookies.get("request_data")){
+                await api.post(`/document/start-process/${filename}`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`, // Authorization header
+                        'Content-Type': 'application/json' // Set content type if needed
+                    }
+                })    
+          //  }
+        
             const blob = new Blob([response2.data], { type: "jpg" });
             const url = URL.createObjectURL(blob);
 
